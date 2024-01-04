@@ -1,12 +1,19 @@
+[tool.pyright]
+include = ["src"]
+pythonVersion = "3.11"
+pythonPlatform = "All"
+typeCheckingMode = "strict"
+
 [build-system]
 requires = ["setuptools"]
 build-backend = "setuptools.build_meta"
 
 [project]
 name = "mezages"
-version = "0.0.1" # Should be dynamic
-requires-python = ">=3.11" # Should be dynamic
+version = "0.0.1"
 readme = "README.md"
+requires-python = ">=3.11"
+license = {file = "LICENSE.md"}
 keywords = ["messages", "errors", "failures", "warnings"]
 description = "A package for the management of operational messages"
 authors = [{name = "Abdulfatai Aka", email = "abdulfataiaka@gmail.com"}]
@@ -14,12 +21,11 @@ maintainers = [{name = "Abdulfatai Aka", email = "abdulfataiaka@gmail.com"}]
 classifiers = [
     "Typing :: Typed",
     "Operating System :: OS Independent",
-    "Development Status :: 2 - Pre-Alpha",
     "Programming Language :: Python :: 3.11",
     "License :: OSI Approved :: MIT License",
-    "Topic :: Software Development :: Libraries :: Python Modules",
 ]
 
 [project.urls]
-Homepage = "https://github.com/aidubtech/mezages"
+Homepage  = "https://github.com/aidubtech/mezages"
+Issues    = "https://github.com/aidubtech/mezages/issues"
 Changelog = "https://github.com/aidubtech/mezages/blob/main/CHANGELOG.md"
