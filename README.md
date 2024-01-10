@@ -3,18 +3,24 @@
 
 ```bash
 
-$ pipenv run autopep8 src tests
+$ pytest tests
 
 ```
 
 ```bash
 
-$ pipenv run flake8 src tests
+$ autopep8 src tests
 
 ```
 
 ```bash
 
-$ pipenv run pyright src tests
+$ flake8 src tests
+
+```
+
+```bash
+
+$ pyright src tests
 
 ```

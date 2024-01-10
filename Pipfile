@@ -4,9 +4,11 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
-pyright = "*"
 flake8 = "*"
+pyright = "*"
 autopep8 = "*"
+pytest = "*"
+pytest-pspec = "*"
 
 [dev-packages]
 

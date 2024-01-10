@@ -5,6 +5,7 @@
 #[Environment]
 .env
 .venv
+.pytest_cache
 
 #[Packaging & Distribution]
 dist/
