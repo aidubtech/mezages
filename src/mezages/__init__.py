@@ -1,1 +1,1 @@
-from .mezages import Mezages as Mezages
+from .mezages import Mezages as Mezages  # noqa
