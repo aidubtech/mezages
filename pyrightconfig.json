@@ -3,5 +3,6 @@
   "pythonVersion": "3.11",
   "pythonPlatform": "All",
   "typeCheckingMode": "strict",
-  "reportMissingTypeStubs": false
+  "reportMissingTypeStubs": false,
+  "reportUnnecessaryIsInstance": false,
 }

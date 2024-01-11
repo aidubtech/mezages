@@ -1,5 +1,5 @@
 from mezages import Mezages
-from tests.test_case import TestCase
+from unittest import TestCase
 
 
 class TestMezages(TestCase):
