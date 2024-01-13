@@ -3,7 +3,7 @@ import copy
 from typing import cast, Any
 
 
-MezagesStore = dict[str, set[str]]
+MezagesStore = dict[str, list[str]]
 
 MezagesInputStore = dict[str, (set[str] | list[str] | tuple[str])]
 
@@ -13,8 +13,8 @@ class MezagesError(Exception):
 
 
 class Mezages:
-    KEY_REGEX = r'(?:(?:\d+)|(?:[a-z][a-z0-9_]+[a-z0-9]))'
-    PATH_PATTERN = re.compile(fr'(?:(?:{KEY_REGEX}\.)*{KEY_REGEX})')
+    KEY_REGEX = r'(?:(?:\d+)|(?:[a-z](?:(?:[a-z0-9]*_)*[a-z0-9]+)*))'
+    PATH_REGEX = fr'(?:(?:{KEY_REGEX}\.)*{KEY_REGEX})'
 
     def __init__(self, store: Any = dict()) -> None:
         self.__store = self.__ensure_store(store)
@@ -24,16 +24,20 @@ class Mezages:
         return copy.deepcopy(self.__store)
 
     def export(self, only: list[str] = list(), omit: list[str] = list()) -> MezagesStore:
-        return dict(item for item in self.__store.items() if (
-            (not only or item[0] in only) and (not omit or item[0] not in omit)
-        ))
+        result: MezagesStore = dict()
+
+        for path, bucket in self.__store.items():
+            if (not only or path in only) and (not omit or path not in omit):
+                result[path] = self.__resolve_messages(path, bucket)
+
+        return result
 
     def __is_key(self, key: Any) -> bool:
-        return isinstance(key, str) and bool(self.PATH_PATTERN.match(key))
+        return isinstance(key, str) and bool(re.fullmatch(self.PATH_REGEX, key))
 
     def __ensure_store(self, store: Any) -> MezagesStore:
         if not isinstance(store, dict):
-            raise MezagesError('Store must be a valid mapping of paths to messages')
+            raise MezagesError('Store must be a mapping of path to a set of messages')
 
         failures: set[str] = set()
         new_store: MezagesStore = dict()
@@ -47,7 +51,7 @@ class Mezages:
             )
 
             if has_valid_path and has_valid_bucket:
-                new_store[path] = set(bucket)
+                new_store[path] = list(set(bucket))
                 continue
 
             if not has_valid_path and has_valid_bucket:
@@ -66,3 +70,6 @@ class Mezages:
                 '',
             ])
         )
+
+    def __resolve_messages(self, path: str, messages: list[str]) -> list[str]:
+        return messages
