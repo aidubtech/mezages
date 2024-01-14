@@ -3,6 +3,11 @@ import copy
 from typing import cast, Any
 
 
+base_path = 'base'
+
+entity_placeholder = '{entity}'
+
+
 MezagesStore = dict[str, list[str]]
 
 MezagesInputStore = dict[str, (set[str] | list[str] | tuple[str])]
@@ -32,18 +37,36 @@ class Mezages:
 
         return result
 
-    def __is_key(self, key: Any) -> bool:
+    def __is_path(self, key: Any) -> bool:
         return isinstance(key, str) and bool(re.fullmatch(self.PATH_REGEX, key))
+
+    def __get_entity_placeholder_value(self, path: str) -> str:
+        # Use value from configuration before defaulting to the path string
+        return ('' if path == base_path else path).strip()
+
+    def __resolve_messages(self, path: str, messages: list[str]) -> list[str]:
+        entity_placeholder_value = self.__get_entity_placeholder_value(path)
+
+        resolved_messages: list[str] = list()
+
+        for message in messages:
+            if message.startswith(entity_placeholder):
+                # How do we handle capitalizing the first letter and handle edge cases too?
+                # We can set placeholder value for a path to an empty string to behave like base
+                message = message.replace(entity_placeholder, entity_placeholder_value, 1).strip()
+            resolved_messages.append(message)
+
+        return resolved_messages
 
     def __ensure_store(self, store: Any) -> MezagesStore:
         if not isinstance(store, dict):
-            raise MezagesError('Store must be a mapping of path to a set of messages')
+            raise MezagesError('Store must be a mapping of path to messages')
 
         failures: set[str] = set()
         new_store: MezagesStore = dict()
 
         for path, bucket in cast(dict[Any, Any], store).items():
-            has_valid_path = self.__is_key(path)
+            has_valid_path = self.__is_path(path)
 
             has_valid_bucket = (
                 type(bucket) in (set, list, tuple) and bucket
@@ -70,6 +93,3 @@ class Mezages:
                 '',
             ])
         )
-
-    def __resolve_messages(self, path: str, messages: list[str]) -> list[str]:
-        return messages
