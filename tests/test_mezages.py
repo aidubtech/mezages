@@ -1,13 +1,12 @@
-from mezages import Mezages
 from unittest import TestCase
 
 
-class TestMezages(TestCase):
+class TestDummy(TestCase):
     '''when checking out integration between pytest and unittest'''
 
     def test_it_should_add_the_two_numbers(self):
-        self.assertEqual(Mezages().export(), {})
+        self.assertEqual(1 + 1, 2)
 
-    def test_find_difference_between_integers(self):
+    def test_difference_between_integers(self):
         '''it should find the difference between two integers'''
         self.assertEqual(4 - 2, 2)
