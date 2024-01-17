@@ -45,7 +45,11 @@ A subject is said to have a parent of `array` type if the last token in its path
 
 A message bag is said to refer to a base subject of type `array` if each child's path starts with an `index` type token
 
-## Behaviours
+## General Constraints
+
+A message bag must never contain children with paths starting with index and key tokens at the same time
+
+## Supported Behaviours
 
 Initialize a message bag (Mezages) optionally with an initial store
 

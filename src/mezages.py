@@ -2,10 +2,11 @@ import re
 from typing import cast, Any
 
 
-base_path = 'base'
+base_path = '{base}'
 entity_placeholder = '{entity}'
 
-MezagesStore = dict[str, list[str]]
+MezagesStore = dict[str, set[str]]
+MezagesOutputStore = dict[str, list[str]]
 MezagesInputStore = dict[str, (set[str] | list[str] | tuple[str, ...])]
 
 
@@ -14,8 +15,10 @@ class MezagesError(Exception):
 
 
 class Mezages:
-    KEY_REGEX = r'(?:(?:\d+)|(?:[a-z](?:(?:[a-z0-9]*_)*[a-z0-9]+)*))'
-    PATH_REGEX = fr'(?:(?:{KEY_REGEX}\.)*{KEY_REGEX})'
+    KEY_REGEX = '[a-z0-9_]+'
+    INDEX_REGEX = r'(?:\[\d+\])'
+    TOKEN_REGEX = f'(?:{INDEX_REGEX}|{KEY_REGEX})'
+    PATH_REGEX = fr'(?:(?:{TOKEN_REGEX}\.)*{TOKEN_REGEX})'
 
     def __init__(self, store: Any = dict()) -> None:
         self.__store = self.__ensure_store(store)
@@ -25,31 +28,48 @@ class Mezages:
         return [message for bucket in self.map.values() for message in bucket]
 
     @property
-    def map(self) -> MezagesStore:
-        return {path: self.__resolve_messages(path, bucket) for path, bucket in self.__store.items()}
+    def map(self) -> MezagesOutputStore:
+        return {path: list(self.__format_messages(path, bucket)) for path, bucket in self.__store.items()}
 
-    def __is_path(self, key: Any) -> bool:
-        return isinstance(key, str) and bool(re.fullmatch(self.PATH_REGEX, key))
+    def __is_path(self, path: Any) -> bool:
+        return path == base_path or (isinstance(path, str) and bool(re.fullmatch(self.PATH_REGEX, path)))
 
-    def __resolve_messages(self, path: str, messages: list[str]) -> list[str]:
-        entity_substitute = str()
+    def __is_array_path(self, path: str) -> bool:  # type: ignore
+        return True
 
-        if path != base_path:
-            # Handle array-like parent entity substitute here
-            # Handle record like parent entity substitute here
-            entity_substitute = path
+    def __is_record_path(self, path: str) -> bool:  # type: ignore
+        return True
 
-        resolved_messages: list[str] = list()
+    def __is_unknown_path(self, path: str) -> bool:  # type: ignore
+        return True
+
+    def __has_array_parent(self, path: str) -> bool:  # type: ignore
+        return True
+
+    def __has_record_parent(self, path: str) -> bool:  # type: ignore
+        return True
+
+    def __get_entity_substitute(self, path: str) -> str:
+        # Add entity substitute logics here
+        return path
+
+    def __format_messages(self, path: str, messages: set[str]) -> set[str]:
+        formatted_messages: set[str] = set()
+
+        entity_substitute = (
+            str() if path == base_path
+            else self.__get_entity_substitute(path)
+        )
 
         for message in messages:
             if message.startswith(entity_placeholder):
                 message = message.replace(entity_placeholder, entity_substitute, 1).strip()
-                # [NOTE] An edge case is when user does not want us to touch the message
+                # [NOTE] An edge case is if developers do not want us to touch the message
                 if entity_substitute == str(): message = f'{message[0].upper()}{message[1:]}'
 
-            resolved_messages.append(message)
+            formatted_messages.add(message)
 
-        return resolved_messages
+        return formatted_messages
 
     def __ensure_store(self, store: Any) -> MezagesStore:
         if not isinstance(store, dict):
@@ -67,7 +87,7 @@ class Mezages:
             )
 
             if has_valid_path and has_valid_bucket:
-                new_store[path] = list(set(bucket))
+                new_store[path] = set(bucket)
                 continue
 
             if not has_valid_path and has_valid_bucket:
@@ -79,10 +99,6 @@ class Mezages:
 
         if not failures: return new_store
 
-        raise MezagesError(
-            '\n'.join([
-                'Encountered some store validation failures\n',
-                *[f'\t[!] {failure}' for failure in failures],
-                '',
-            ])
-        )
+        raise MezagesError('\n'.join([
+            'Encountered some store issues\n', *[f'\t[!] {failure}' for failure in failures], '',
+        ]))
