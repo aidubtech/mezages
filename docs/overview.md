@@ -1,62 +1,58 @@
 <h1 align="center">Overview</h1>
 
-Mezages is a `message bag` management package that handles the formatting of operational messages, so that developers can focus on displaying messages to their end users instead of dealing with formatting them first
+Mezages is a package that is responsible for the collation, organization and formatting of user facing messages
 
 The following are topics we will discuss under this package
+- [Sacks](#sacks)
 - [Subjects](#subjects)
 - [Messages](#messages)
-- [Behaviours](#behaviours)
+- [Public Interface](#behaviours)
+
+## Sacks
+
+We want to reserve the name `mezages` for the package when having conversations, but we do have a `Mezages` class which is the core of the package and we don't want to call instances of this class `mezages` too. So we decided to refer to any instance of the `Mezages` class as a `sack` of organized messages
+
+Now, we define a `sack` as an instance of the Mezages class that internally manages a `store` of messages. This internal store is a mapping of `path` and `bucket` pairs, where each path is a string that must match a strict pattern, and each bucket is a non-empty set of messages
+
+Each path within a sack will always refer to a datum which can be of any data type, except for a special path called the `base path` which will hold messages that may or may not relate to a datum
+
+Kindly note and get familiarized with the terms used in the above definitions: `Sack`, `Store`, `Path`, `Bucket`, `Base Path`
 
 ## Subjects
 
-These are entities that will be associated with one or more messages
+A subject is a datum identified by a path in a sack that is mapped to a bucket
 
-A subject can be one of the following types, namely (1) Array (2) Record (3) Unknown
+A path (*excluding the base path*) is a string that is made up of one or more `tokens` joined together by a dots
+- A token can be of type `index` or `key`
+- An index type token is any string that matches the pattern `[<int>]`. Examples: `[0]`, `[2]`, `[10]`, etc
+- A key type token is any string that contains only alphabet, integer and underscore characters. Examples: `1`, `_`, `data01`, `int_num2`, etc
+- Examples of path strings includes but not limited to the following: `[0]`, `email`, `data.users.[0].name`, `data.members.[0].roles.[1].key`, etc
 
-A subject may have `children` (a.k.a child subjects or nested subjects) if it is of array or record type
+The exact data type of a subject is only known outside of a sack. However, we can "kind of" deduce a custom type from the subject's path using the following logic
+- Given a subject in a sack
+- If there are other subjects in the sack whose path starts with the subject's path
+- Then we associate a type to the subject by looking at the first token after the subject's path within each of the other subjects paths
+    * If that first token is a key type token, then we say the subject is of `record` type
+    * However, if that first token is an index type token, then we say the subject is of `array` type
 
-Each message bag in its entirety will refer to some `base subject`
+**Note that:** We should have a constraint that a sack should only contain paths whose first tokens are homogeneous (i.e either key or index type but not both)
 
 ## Messages
 
-These are texts presented in the most user-frendly form to keep users informed about their operations
+These are texts that will be presented in the most user-frendly form to keep users informed about operations
 
-A collection of one or more messages will be refered to as a `bucket of messages`
+As mentioned above, a set of one or more messages is refered to as a `bucket` of messages, where a bucket is always owned by a subject
 
-Each bucket of messages will always be associated with a subject
+A message can be one of two types, namely (1) Partial (2) Complete
 
-## Subject Paths
+A partial message is one that starts with the subject placeholder which can be any string, but it will be assigned to a global variable named `subject_placeholder`, so as to not break downstream codes. But for now, we will set the global variable as such -> `subject_placeholder = '{subject}'`
 
-A subject within a message bag is identified by a `path` which always shows its `lineage`
+A message that is not partial is said to be complete regardless of whether or not it contains the subject placeholder, but in the wrong position
 
-A base subject will always be identified within its message bag by a special path called the `base path`
+Internally, we will attempt to replace subject placeholders with string substitutes that makes an entire message read more user-friendly. But if that is impossible, we will fallback to the subject's path
 
-A path (*excluding the base path*) is made up of one or more `tokens`, which can be of `index` or `key` type
-- A token of index type will match the format `[integer]`
-- A token of key type must be string containing only alphabet, integer and underscore characters
+## Public Interface
 
-## Getting Subject Type
+We have the `all` property which returns a flat list of formatted messages
 
-A subject is said to have a parent of `record` type if the last token in its path is of `key` type
-
-A message bag is said to belong to a base subject of type `record` if each child's path starts with a `key` type token
-
-A subject is said to have a parent of `array` type if the last token in its path is of `index` type
-
-A message bag is said to belong to a base subject of type `array` if each child's path starts with an `index` type token
-
-## General Constraints
-
-A message bag must never contain children with paths starting with index and key tokens at the same time
-
-## Supported Behaviours
-
-Initialize a message bag (Mezages) optionally with an initial store
-
-Add one or more messages to a path while keeping the uniqueness of its bucket
-
-Get all formatted messages as a mapping or a flat array
-
-Merge a store into the current Mezages instance optionally on a mount point
-
-Merge an instance of Mezages into the current instance optionally on a mount point
+We have the `map` property which returns a dictionary of paths mapped to buckets of formatted messages
