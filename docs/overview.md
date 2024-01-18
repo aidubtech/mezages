@@ -39,11 +39,11 @@ A path (*excluding the base path*) is made up of one or more `tokens`, which can
 
 A subject is said to have a parent of `record` type if the last token in its path is of `key` type
 
-A message bag is said to refer to a base subject of type `record` if each child's path starts with a `key` type token
+A message bag is said to belong to a base subject of type `record` if each child's path starts with a `key` type token
 
 A subject is said to have a parent of `array` type if the last token in its path is of `index` type
 
-A message bag is said to refer to a base subject of type `array` if each child's path starts with an `index` type token
+A message bag is said to belong to a base subject of type `array` if each child's path starts with an `index` type token
 
 ## General Constraints
 
