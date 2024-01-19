@@ -90,3 +90,20 @@ class Mezages:
         raise MezagesError('\n'.join([
             'Encountered some store issues\n', *[f'\t[!] {failure}' for failure in failures], '',
         ]))
+
+    def union(self, store: MezagesInputStore, mount_path: str | None = None) -> None:
+        # validate arguments
+        self.__ensure_store(store)
+        self.__is_path(mount_path)
+
+        # if the mount_path exist, arrange the path accordingly
+        adjusted_store = {f"{mount_path}.{path}" if mount_path else path: sack for path, sack in store.items()}
+
+        # iterate through the adjusted store, and unify with the existing paths instance
+        for path, sack in adjusted_store.items():
+            if path in self.__store:
+                # unify the sack if path already exist
+                self.__store[path] = self.__store[path].union(sack)
+            else:
+                # copy path and sack into the instance
+                self.__store[path] = set(sack)
