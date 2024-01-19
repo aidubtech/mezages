@@ -149,49 +149,69 @@ class TestPropertiesAndMethods(TestCase):
         self.assertTrue("[!] '{base}' is not mapped to a valid bucket of messages" in exception_message)
         self.assertTrue("[!] 'data.email' has one or more invalid messages in its bucket" in exception_message)
 
-    def test_union_without_mount_point(self):
-        '''it unifies messages from the store without a mount point'''
 
-        self.mezages.union({
+class TestUnionMethod(TestCase):
+    '''when calling a method on the instance messages'''
+
+    def setUp(self):
+        self.message = Mezages({
+            base_path: [f'{subject_placeholder} must contain only 5 characters'],
+            'gender': {f'{subject_placeholder} is not a valid gender string'},
+            'data.email': (
+                f'{subject_placeholder} must have the gmail domain',
+                f'{subject_placeholder} is not a valid email address',
+            ),
+        })
+
+    def test_union_with_mount_point(self):
+        '''it unifies from store with a mount point'''
+
+        self.message.union({
             base_path: [f'{subject_placeholder} must contain only 5 characters'],
             'gender': {f'{subject_placeholder} is not a valid gender string'},
             'data.email': (
                 f'{subject_placeholder} is not a valid email address',
                 f'{subject_placeholder} must have the Gmail domain'
             ),
-        })
+        }, mount_path='user')
 
-        self.assertEqual(self.mezages.map, {
-            base_path: [
-                f'{subject_placeholder} must be a string',
-                f'{subject_placeholder} must contain only 5 characters'
-            ],
-            'gender': [f'{subject_placeholder} is not a valid gender string'],
+        expected_result = {
+            '{base}': ['Must contain only 5 characters'],
+            'gender': ['gender is not a valid gender string'],
             'data.email': [
-                f'{subject_placeholder} is not a valid email address',  # Duplicates of this message were removed
-                f'{subject_placeholder} must have the Gmail domain'
+                'data.email must have the gmail domain',
+                'data.email is not a valid email address'
             ],
-        })
+            'user.{base}': ['user.{base} must contain only 5 characters'],
+            'user.gender': ['user.gender is not a valid gender string'],
+            'user.data.email': [
+                'user.data.email is not a valid email address',
+                'user.data.email must have the Gmail domain'
+            ],
+        }
 
-    def test_union_with_mount_point(self):
-        '''it unifies the messages from store with mount point'''
+        self.assertDictEqual(self.message.map, expected_result)
 
-        self.mezages.union({
-            base_path: [f'{subject_placeholder} must contain only 3 characters'],
+    def test_union_without_mount_point(self):
+        '''it unifies messages from store without a mount point'''
+
+        self.message.union({
+            base_path: [f'{subject_placeholder} must contain only 5 characters'],
             'gender': {f'{subject_placeholder} is not a valid gender string'},
             'data.email': (
                 f'{subject_placeholder} is not a valid email address',
-                f'{subject_placeholder} must have the Yahoo domain',
-            ),
-        }, mount_path='user')
-
-        self.assertEqual(self.mezages.map, {
-            'base': [f'{subject_placeholder} must be a string'],
-            'data.email': [f'{subject_placeholder} is not a valid email address'],
-            'user': [f'{subject_placeholder} must contain only 5 characters'],
-            'user.gender': [f'{subject_placeholder} is not a valid gender string'],
-            'user.data.email': [
-                f'{subject_placeholder} is not a valid email address',
                 f'{subject_placeholder} must have the Gmail domain'
+            ),
+        }, mount_path=None)
+
+        expected_result = {
+            '{base}': ['Must contain only 5 characters'],
+            'gender': ['gender is not a valid gender string'],
+            'data.email': [
+                'data.email must have the gmail domain',
+                'data.email is not a valid email address',
+                'data.email must have the Gmail domain'
             ],
-        })
+        }
+
+        self.assertDictEqual(self.message.map, expected_result)
