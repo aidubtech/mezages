@@ -148,3 +148,50 @@ class TestPropertiesAndMethods(TestCase):
         # For example, incompletely defined error messages provided here wil still make the assertions pass
         self.assertTrue("[!] '{base}' is not mapped to a valid bucket of messages" in exception_message)
         self.assertTrue("[!] 'data.email' has one or more invalid messages in its bucket" in exception_message)
+
+    def test_union_without_mount_point(self):
+        '''it unifies messages from the store without a mount point'''
+
+        self.mezages.union({
+            base_path: [f'{subject_placeholder} must contain only 5 characters'],
+            'gender': {f'{subject_placeholder} is not a valid gender string'},
+            'data.email': (
+                f'{subject_placeholder} is not a valid email address',
+                f'{subject_placeholder} must have the Gmail domain'
+            ),
+        })
+
+        self.assertEqual(self.mezages.map, {
+            base_path: [
+                f'{subject_placeholder} must be a string',
+                f'{subject_placeholder} must contain only 5 characters'
+            ],
+            'gender': [f'{subject_placeholder} is not a valid gender string'],
+            'data.email': [
+                f'{subject_placeholder} is not a valid email address',  # Duplicates of this message were removed
+                f'{subject_placeholder} must have the Gmail domain'
+            ],
+        })
+
+    def test_union_with_mount_point(self):
+        '''it unifies the messages from store with mount point'''
+
+        self.mezages.union({
+            base_path: [f'{subject_placeholder} must contain only 3 characters'],
+            'gender': {f'{subject_placeholder} is not a valid gender string'},
+            'data.email': (
+                f'{subject_placeholder} is not a valid email address',
+                f'{subject_placeholder} must have the Yahoo domain',
+            ),
+        }, mount_path='user')
+
+        self.assertEqual(self.mezages.map, {
+            'base': [f'{subject_placeholder} must be a string'],
+            'data.email': [f'{subject_placeholder} is not a valid email address'],
+            'user': [f'{subject_placeholder} must contain only 5 characters'],
+            'user.gender': [f'{subject_placeholder} is not a valid gender string'],
+            'user.data.email': [
+                f'{subject_placeholder} is not a valid email address',
+                f'{subject_placeholder} must have the Gmail domain'
+            ],
+        })

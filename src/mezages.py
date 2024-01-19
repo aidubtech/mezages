@@ -97,12 +97,12 @@ class Mezages:
         self.__is_path(mount_path)
 
         # if the mount_path exist, arrange the path accordingly
-        adjusted_store = {f"{mount_path}.{path}" if mount_path else path: sack for path, sack in store.items()}
+        adjusted_store = {f"{mount_path}.{path}" if mount_path else path: bucket for path, bucket in store.items()}
 
-        for path, sack in adjusted_store.items():
+        for path, bucket in adjusted_store.items():
             if path in self.__store:
                 # unify the bucket if path already exist
-                self.__store[path] = self.__store[path].union(sack)
+                self.__store[path] = self.__store[path].union(bucket)
             else:
                 # copy path and bucket into the instance
-                self.__store[path] = set(sack)
+                self.__store[path] = set(bucket)
