@@ -5,7 +5,7 @@ from typing import cast, Any
 base_path = '{base}'
 subject_placeholder = '{subject}'
 
-MezagesStore = dict[str, set[str]]
+MezagesStore = dict[str, Any]
 MezagesOutputStore = dict[str, list[str]]
 MezagesInputStore = dict[str, (set[str] | list[str] | tuple[str, ...])]
 
@@ -90,3 +90,35 @@ class Mezages:
         raise MezagesError('\n'.join([
             'Encountered some store issues\n', *[f'\t[!] {failure}' for failure in failures], '',
         ]))
+    
+    # .....merge method begins......
+    
+    def merge(self, other: 'Mezages', mount_path: str | None) -> None:
+        # Validate arguments
+        if not isinstance(other, Mezages):
+            raise MezagesError('other must be an instance of Mezages')
+        if mount_path is not None and not self.__is_path(mount_path):
+            raise MezagesError('Mount path must be None or a valid path string')
+
+        # function to merge buckets
+        def merge_buckets(existing_bucket: set[str], new_bucket: list[str]) -> set[str]:
+            return existing_bucket.union(set(new_bucket))
+
+        # function to merge paths
+        def merge_paths(existing_path: str, new_path: str, mount_point: str | None = None) -> str:
+            if mount_point is not None:
+                return f'{mount_point}.{new_path}'
+            return existing_path
+
+        # Merge paths and buckets
+        for other_path, other_bucket in other.map.items():
+            merged_path = merge_paths(self.__get_subject_substitute(other_path), other_path, mount_path)
+            if merged_path in self.__store:
+                # Path exists, merge buckets
+                self.__store[merged_path] = merge_buckets(self.__store[merged_path], other_bucket)
+            else:
+                # Path doesn't exist, create new entry
+                self.__store[merged_path] = other_bucket
+
+    # .....merge method ends......
+
