@@ -215,3 +215,25 @@ class TestUnionMethod(TestCase):
         }
 
         self.assertDictEqual(self.message.map, expected_result)
+
+    def test_union_with_empty_store(self):
+        '''it should handle an empty mount point without raising error'''
+
+        # Call union with a non-empty store and an empty mount path
+        self.message.union({
+            base_path: [f'{subject_placeholder} must contain only 5 characters'],
+            'gender': {f'{subject_placeholder} is not a valid gender string'},
+            'data.email': (
+                f'{subject_placeholder} is not a valid email address',
+                f'{subject_placeholder} must have the Gmail domain'
+            ),
+        }, mount_path='')
+
+        # ensures that the original message map remains unchanged
+        expected_result = {
+            'base': ['{entity} must contain only 5 characters', '{entity} must be a string'],
+            'data.email': ['{entity} must have the Gmail domain', '{entity} is not a valid email address'],
+            'gender': ['{entity} is not a valid gender string']
+        }
+
+        self.assertDictEqual(self.message.map, expected_result)
