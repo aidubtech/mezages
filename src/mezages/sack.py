@@ -3,8 +3,6 @@ from mezages.path import Path
 from mezages.bucket import Bucket
 
 
-subject_placeholder = '{subject}'
-
 SackStore = dict[Path, Bucket]
 SackOutputStore = dict[str, list[str]]
 SackInputStore = dict[str, (set[str] | list[str] | tuple[str, ...])]

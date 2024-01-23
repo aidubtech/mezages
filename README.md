@@ -40,7 +40,6 @@ $ pipenv install
 $ pipenv install <dependency>
 
 ```
-Hurray!!! You are now ready to start using the worklow commands below to work and contribute to the package
 
 ## Quick Actions
 
@@ -66,7 +65,7 @@ $ pipenv install --editable .
 ```bash
 
 # Ensure to install package before running tests
-$ pytest --no-header src tests
+$ pytest --no-header tests
 
 ```
 
