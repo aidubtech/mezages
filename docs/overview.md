@@ -1,58 +1,177 @@
 <h1 align="center">Overview</h1>
 
-Mezages is a package that is responsible for the collation, organization and formatting of user facing messages
+Mezages is a package that defines a standard interface for collecting, organizing and formatting operational messages
 
-The following are topics we will discuss under this package
-- [Sacks](#sacks)
-- [Subjects](#subjects)
-- [Messages](#messages)
-- [Public Interface](#behaviours)
+The following are the topics that will be discussed under this package
+* [Sacks](#sacks)
+* [Tokens](#tokens)
+* [Paths](#paths)
+* [Buckets](#buckets)
+* [Subjects](#subjects)
+    - [Path Types](#path-types)
+    - [Child Subjects](#child-subjects)
+    - [Subject Types](#subject-types)
 
-## Sacks
+# Sacks
 
-We want to reserve the name `mezages` for the package when having conversations, but we do have a `Mezages` class which is the core of the package and we don't want to call instances of this class `mezages` too. So we decided to refer to any instance of the `Mezages` class as a `sack` of organized messages
+The core of the package will be a sack class that defines an interface for managing of a store, adding new messages, outputing formatted messages, and any other necessary functionalities that will make us achieve our set goals and objectives for the package
 
-Now, we define a `sack` as an instance of the Mezages class that internally manages a `store` of messages. This internal store is a mapping of `path` and `bucket` pairs, where each path is a string that must match a strict pattern, and each bucket is a non-empty set of messages
+A `sack` is simply an instance of the sack class defined above
 
-Each path within a sack will always refer to a datum which can be of any data type, except for a special path called the `base path` which will hold messages that may or may not relate to a datum
+The `store` managed within a sack is simply a dictionary of string keys each one mapped to a unique array of one or more strings. Each string key will be called a `path`, and each string within the array will be called a `message`, while the array as a whole will be called a `bucket`
 
-Kindly note and get familiarized with the terms used in the above definitions: `Sack`, `Store`, `Path`, `Bucket`, `Base Path`
+A path will be used to represent external entities for which we want to record messages. Each one of these entities will be called a `subject`
 
-## Subjects
+The store managed within a sack might look something like this
 
-A subject is a datum identified by a path in a sack that is mapped to a bucket
+```python
+{
+    '%root%': {
+        'Must be an object of record type',
+        'Root subjects cannot hold partial messages',
+    },
+    'person': {
+        'Must be an object of record type',
+        'Unknown type subjects cannot hold partial messages',
+    },
+    'person.{roles}': {
+        '{subject} cannot be an empty array',
+        'Subject can hold both complete and partial messages',
 
-A path (*excluding the base path*) is a string that is made up of one or more `tokens` joined together by a dots
-- A token can be of type `index` or `key`
-- An index type token is any string that matches the pattern `[<int>]`. Examples: `[0]`, `[2]`, `[10]`, etc
-- A key type token is any string that contains only alphabet, integer and underscore characters. Examples: `1`, `_`, `data01`, `int_num2`, etc
-- Examples of path strings includes but not limited to the following: `[0]`, `email`, `data.users.[0].name`, `data.members.[0].roles.[1].key`, etc
+    },
+}
+```
 
-The exact data type of a subject is only known outside of a sack. However, we can "kind of" deduce a custom type from the subject's path using the following logic
-- Given a subject in a sack
-- If there are other subjects in the sack whose path starts with the subject's path
-- Then we associate a type to the subject by looking at the first token after the subject's path within each of the other subjects paths
-    * If that first token is a key type token, then we say the subject is of `record` type
-    * However, if that first token is an index type token, then we say the subject is of `array` type
+# Tokens
 
-**Note that:** We should have a constraint that a sack should only contain paths whose first tokens are homogeneous (i.e either key or index type but not both)
+A `token` is a string that must be used in the construction of a path
 
-## Messages
+It must conform to the specification of one of the `token types` listed below
 
-These are texts that will be presented in the most user-frendly form to keep users informed about operations
+`Index`
+* This is a string that conforms to the format - `[<content>]`
+* Where `<content>` is any integer greater than or equal to zero
+* Examples include: `[0]`, `[10]`, `[213]`, `[5050]`, `[23231]`, etc
 
-As mentioned above, a set of one or more messages is refered to as a `bucket` of messages, where a bucket is always owned by a subject
+`Symbol`
+* This is a string that conforms to the format - `{<content>}`
+* Where `<content>` is a string that contains only alphabet, integer and underscore characters
+* Examples include: `{data}`, `{recrod01}`, `{id_005}`, `{email_address}`, `{person_01_id}`, etc
 
-A message can be one of two types, namely (1) Partial (2) Complete
+`Unknown`
+* This is a string that contains only alphabet, integer and underscore characters
+* Examples include: `data`, `recrod01`, `id_005`, `email_address`, `person_01_id`, etc
 
-A partial message is one that starts with the subject placeholder which can be any string, but it will be assigned to a global variable named `subject_placeholder`, so as to not break downstream codes. But for now, we will set the global variable as such -> `subject_placeholder = '{subject}'`
+# Paths
 
-A message that is not partial is said to be complete regardless of whether or not it contains the subject placeholder, but in the wrong position
+*See the introductry definition of a path and what it represent within a sack under the [Sacks](#sacks) section above*
 
-Internally, we will attempt to replace subject placeholders with string substitutes that makes an entire message read more user-friendly. But if that is impossible, we will fallback to the subject's path
+A path is a string that must be made up of one or more tokens, each one joined to the next with a single dot character
 
-## Public Interface
+Examples include:
+* `0`
+* `data`
+* `[0]`
+* `{user}`
+* `data.{users}.[0].{name}`
+* `records.[0].{person}.{role}.{name}`
 
-We have the `all` property which returns a flat list of formatted messages
+Looking at the token and path examples above, we can deduce the statement that: `All tokens can be paths, but not all paths can be tokens`
 
-We have the `map` property which returns a dictionary of paths mapped to buckets of formatted messages
+We can see that a path shows the lineage of the subject it represents. However, the subject itself is identified by the last token in the path. Therefore, given a subject with the path `records.[0].{person}`, we will say that the subject's token is `{person}` and the subject's path is `records.[0].{person}`
+
+# Buckets
+
+*See the introductry definition of a bucket and what it represent within a sack under the [Sacks](#sacks) section above*
+
+A message can be partial or complete. A message is said to be `partial` if it starts with the global `subject placeholder` value. Otherwise, it is `complete`
+
+**Note:** Subject placeholders used at positions other than the start of a message will be ignored when formatting such message
+
+Examples of partial messages include but are not limited to the following
+* `{subject} cannot be an integer`
+* `{subject} must have a value that is of string type`
+* `{subject} given the name {subject} must be a boolean`
+
+Examples of complete messages include but are not limited to the following
+* `The {subject} must be of integer type`
+* `Some user with id provided does not exist in the cache`
+* `Propery name in {subject} with id {subject} is not valid`
+
+The global placeholder can be any string value which can be changed at any time. For this reason, changes to this value can break downstream codes. Therefore, we will assign it to a global variable named `subject_placeholder` to prevent such issue. But within the context of this document, we will assume that it has been set to `{subject}`
+
+Internally, we will attempt to replace only the first subject placeholder in partial messages with substitutes that makes the messages read more user-friendly. However, if we are unable to come up with a good substitute, we will fallback to the subject's path
+
+**Constraint:** Only complete messages can be associated with root subjects and child subjects of unknown type
+
+# Subjects
+
+*See the introductry definition of a subject and how it is represented within a sack under the [Sacks](#sacks) section above*
+
+A subject is also seen as an entity that can own a sack or just a bucket within a sack. A subject that owns a sack is called a `root subject`, while a subject that owns a bucket within a sack is called a `child subject`
+
+### Path Types
+
+A child subject will always have a path mapped to a bucket within a sack. Therefore, the path will be called a `child path`, which must conform to the constraints defined under the [Paths](#paths) section above
+
+Subjects exist only because we want to associate messages with them. But the root subject is outside its own sack. We will need to represent it in one way or the other, so that we can associate messages with it. For this reason, we will have a special path called the `root path` that will represent a root subject within its own sack. But within the context of this documentation, we will assume that the root path has been set to `%root%`
+
+The root path can be any string value which can be changed at any time. For this reason, changes to this value can break downstream codes. Therefore, we will assign it to a global variable named `root_path` to prevent such issue
+
+### Child Subjects
+
+A subject is said to have `child subjects` or `children` if
+* It is a root subject with child subjects represented within its sack
+* Or it's path starts the path of one or more child subjects within a sack
+
+**Constraint:** The first token in each child's path of any subject must be of the same token type
+
+### Subject Types
+
+The true essence of a subject is only known outside of this package. Therefore, we cannot know it real type. For this reason, we will define some custom subject types that can be associate with subjects, to aid the proper formatting of messages associated with them
+
+The following are the custom subject types that will be supported, along with how they will be associated with subjects
+* A subject is said to be of `Record` type, if it has children, and the first token in each of its child's path is a `key` type token
+* A subject is said to be of `Array` type, if it has children, and the first token in each of its child's path is an `index` type token
+* A subject is said to be of `Unknown` type, if it has no children or the first token in each of its child's path is an `unknown` type token
+
+### Example
+
+Given a root subject that own a sack with the store below
+
+```python
+{
+    '%root%': {
+        'Must be an object of record type',
+        'Root subjects cannot hold partial messages',
+    },
+    'person': {
+        'Must be an object of record type',
+        'Unknown type subjects cannot hold partial messages',
+    },
+    'person.{roles}': {
+        '{subject} cannot be an empty array',
+        'Subject can hold both complete and partial messages',
+
+    },
+    'person.{roles}.[0]': {
+        'Item at index 0 must be of record type',
+        '{subject} can hold both complete and partial messages',
+    },
+    'person.{gender}': {
+        '{subject} must be a gender string value from the genders list',
+    },
+    
+}
+```
+
+Then, we will can say the following
+* The root subject have exactly four children
+* Subject with the path `person` have exactly two children
+* Subject with the path `person.{roles}` have exactly one child
+* Subject with the path `person` has the root subject as its parent
+* Subject with the path `person.{roles}.[0]` is not a child of subject with the path `person`
+* Subject with the path `person.{roles}` has subject with the path `person` as its parent
+* Subject with the path `person.{roles}.[0]` has subject with the path `person.{roles}` as its parent
+* Subject with the path `person.{roles}` is of array type because the first token of its child paths is an index type token - `[0]`
+* Subject with the path `person` is of record type because the first token of its child paths is a key type token - `{roles}` and `{gender}`

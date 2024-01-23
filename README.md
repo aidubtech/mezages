@@ -5,17 +5,44 @@
 
 Ensure you are using python version 3.11+
 
-Clone the repository -> `git clone https://github.com/aidubtech/mezages.git`
+*Clone the repository*
 
-Install pipenv with pip -> `python -m pip install pipenv`
+```bash
 
-Install all package dependencies into a local virtual environment -> `PIPENV_VENV_IN_PROJECT=true pipenv install`
-* Note that once vscode loads the local virtual environment into your shells, dependency installations can just use `pipenv install`
-* Otherwise, you will have to utilize the commands `pipenv shell` and `pipenv run` to work within the created local virtual environment
+$ git clone https://github.com/aidubtech/mezages.git
 
-Hurray!!! You are now ready to start using the worklow commands below to work and contribute to package
+```
 
-## Workflow Commands
+*Install pipenv with pip*
+
+```bash
+
+$ python -m pip install pipenv
+
+```
+
+*Install all package dependencies into a local virtual environment*
+
+```bash
+
+$ PIPENV_VENV_IN_PROJECT=true pipenv install
+
+```
+
+**Note:** Once VSCode loads the local virtual environment into your shells, dependency installations can be done simply by using the below commands. Otherwise, you will have to utilize the `pipenv shell` and `pipenv run` commands to work within the created local virtual environment
+
+```bash
+
+$ pipenv install
+
+# OR
+
+$ pipenv install <dependency>
+
+```
+Hurray!!! You are now ready to start using the worklow commands below to work and contribute to the package
+
+## Quick Actions
 
 ```bash
 
@@ -43,17 +70,29 @@ $ pytest --no-header src tests
 
 ```
 
-## Documentation
+## Learn More
 
-- [Overview](docs/overview.md)
-- [Interface](docs/interface.md)
+* [Overview](docs/overview.md)
 
 ## Maintainers
 
-[@belloibrahv](https://github.com/belloibrahv)
-[@yuusuf4real](https://github.com/yuusuf4real)
-[@abdulfataiaka](https://github.com/abdulfataiaka)
+<div style="display: flex; align-items: center; column-gap: 1rem">
+    <div style="display: flex; align-items: center">
+        <img src="https://github.com/belloibrahv.png" alt="avatar" style="width: 1.6rem; height: 1.6rem; border-radius: 50%" />
+        <span style="margin-left: 0.3rem">Bello Ibrahim</span>
+    </div>
+    <div style="display: flex; align-items: center">
+        <img src="https://github.com/yuusuf4real.png" alt="avatar" style="width: 1.6rem; height: 1.6rem; border-radius: 50%" />
+        <span style="margin-left: 0.3rem">Yuusuf Ariyibi</span>
+    </div>
+    <div style="display: flex; align-items: center">
+        <img src="https://github.com/abdulfataiaka.png" alt="avatar" style="width: 1.6rem; height: 1.6rem; border-radius: 50%" />
+        <span style="margin-left: 0.3rem">Abdulfatai Aka</span>
+    </div>
+</div>
 
 ## License
+
+Licensed under the [MIT](LICENSE) License
 
 Copyright © 2024 Aidub Technologies
