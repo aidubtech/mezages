@@ -24,8 +24,9 @@ class Subject:
         try:
             first_child_path = next(
                 store_path for store_path in store.keys() if (
-                    not store_path.is_root
-                    and (path.is_root or store_path.startswith(f'{path}.'))
+                    not store_path.is_root and (
+                        path.is_root or store_path.startswith(f'{path}.')
+                    )
                 )
             )
         except StopIteration: pass

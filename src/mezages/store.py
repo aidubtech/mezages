@@ -53,6 +53,6 @@ class Store(dict[Path, Bucket]):
                 failures.add(f'{repr(path)} is an invalid path mapped to an invalid bucket')
 
         return failures
-    
+
     def __init__(self, initval: Any = dict()) -> None:
         super().__init__(self.ensure(initval))

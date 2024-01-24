@@ -16,8 +16,9 @@ class Path(str):
     @classmethod
     def is_valid(cls, argument: Any) -> bool:
         return argument == root_path or (
-            isinstance(argument, str)
-            and bool(cls.PATH_PATTERN.fullmatch(argument))
+            isinstance(argument, str) and bool(
+                cls.PATH_PATTERN.fullmatch(argument)
+            )
         )
 
     @classmethod
