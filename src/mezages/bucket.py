@@ -1,46 +1,41 @@
-from typing import cast, Any
-from mezages.path import Path
+from typing import Any
+from mezages.subject import subject_placeholder
 
 
-subject_placeholder = '{subject}'
+Messages = set[str]
+
+OutputMessages = list[str]
 
 
 class BucketError(Exception):
     pass
 
 
-class Bucket:
+class Bucket(Messages):
     @classmethod
-    def valid(cls, bucket: Any) -> bool:
-        return type(bucket) in (set, list, tuple) and not any(
-            not isinstance(message, str) for message in cast(set[str], bucket)
+    def is_valid(cls, argument: Any) -> bool:
+        return type(argument) in (set, list, tuple) and not any(
+            not isinstance(message, str) for message in argument
         )
 
-    def __init__(self, value: Any = set()):
-        self.__value = self.__ensure_bucket(value)
+    @classmethod
+    def ensure(cls, argument: Any) -> Messages:
+        if cls.is_valid(argument): return set(argument)
+        # Find a way to pretty print the structure in error
+        raise BucketError(f'{repr(argument)} is an invalid bucket')
 
-    @property
-    def value(self) -> set[str]:
-        return self.__value
+    def __init__(self, initval: Any = set()):
+        super().__init__(self.ensure(initval))
 
-    @property
-    def has_partial_messages(self) -> bool:
-        return any(message.startswith(subject_placeholder) for message in self.__value)
+    def format(self, subject_substitute: (str | None)) -> OutputMessages:
+        formatted_messages: Messages = set()
 
-    def format_messages(self, path: Path = Path()) -> set[str]:
-        formatted_messages: set[str] = set()
-
-        for message in self.__value:
+        for message in self:
             if message.startswith(subject_placeholder):
-                message = message.replace(subject_placeholder, path.substitute, 1).strip()
-                # Uppercase the first character if the subject was an empty string
-                # [NOTE] An edge case is if caller do not want us to touch the message
-                if path.substitute == str(): message = f'{message[0].upper()}{message[1:]}'
+                message = message.replace(subject_placeholder, subject_substitute or str(), 1).strip()
+                # [NOTE] Edge case is when it is undesired for us to uppercase the first character
+                if subject_substitute is None: message = f'{message[0].upper()}{message[1:]}'
 
             formatted_messages.add(message)
 
-        return formatted_messages
-
-    def __ensure_bucket(self, value: Any) -> set[str]:
-        if self.__class__.valid(value): return set(value)
-        raise BucketError(f'{repr(value)} is an invalid bucket')
+        return list(formatted_messages)
