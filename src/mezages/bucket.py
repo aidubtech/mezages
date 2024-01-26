@@ -1,4 +1,4 @@
-from typing import Any
+from typing import Any, Optional
 from mezages.subject import subject_placeholder
 
 
@@ -27,7 +27,7 @@ class Bucket(Messages):
     def __init__(self, initval: Any = set()):
         super().__init__(self.ensure(initval))
 
-    def format(self, subject_substitute: (str | None)) -> OutputMessages:
+    def format(self, subject_substitute: Optional[str]) -> OutputMessages:
         formatted_messages: Messages = set()
 
         for message in self:
