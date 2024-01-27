@@ -1,6 +1,6 @@
 from mezages.path import Path
 from mezages.token import Token
-from typing import Literal, TYPE_CHECKING
+from typing import Literal, Optional, TYPE_CHECKING
 
 
 if TYPE_CHECKING:
@@ -51,7 +51,7 @@ class Subject:
         return ('any' if is_any_type else self_type, parent_type)
 
     @classmethod
-    def get_substitute(cls, path: Path, store: 'Store') -> (str | None):
+    def get_substitute(cls, path: Path, store: 'Store') -> Optional[str]:
         if path.is_root: return None
 
         self_type = cls.get_type_pair(path, store)[0]

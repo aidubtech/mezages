@@ -4,10 +4,6 @@ from mezages.bucket import OutputMessages
 from mezages.store import Store, OutputStore
 
 
-class SackError(Exception):
-    pass
-
-
 class Sack:
     def __init__(self, init_store: Any = dict()) -> None:
         self.__store = Store(init_store)
