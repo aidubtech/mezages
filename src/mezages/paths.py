@@ -2,9 +2,18 @@ import re
 from typing import Any, Literal
 
 
-# ----------------------------------------
-# Constants
-# ----------------------------------------
+#----------------------------------------
+# TYPE ALIASES
+#----------------------------------------
+
+TokenType = Literal['key'] | Literal['index'] | Literal['unknown']
+
+
+#----------------------------------------
+# CONSTANTS
+#----------------------------------------
+
+ROOT_PATH = '%root%'
 
 TOKEN_REGEX = r'(?:[^\.]+)'
 
@@ -17,34 +26,20 @@ INDEX_TOKEN_PATTERN = re.compile(INDEX_TOKEN_REGEX)
 PATH_PATTERN = re.compile(fr'(?:(?:{TOKEN_REGEX}\.)*{TOKEN_REGEX})')
 
 
-# ----------------------------------------
-# Variables
-# ----------------------------------------
-
-root_path = '%root%'
-
-
-# ----------------------------------------
-# Type Aliases
-# ----------------------------------------
-
-TokenType = Literal['key'] | Literal['index'] | Literal['unknown']
-
-
-# ----------------------------------------
-# Exception Classes
-# ----------------------------------------
+#----------------------------------------
+# ERROR CLASSES
+#----------------------------------------
 
 class PathError(Exception):
     pass
 
 
-# ----------------------------------------
-# Functions
-# ----------------------------------------
+#----------------------------------------
+# REUSABLE PROCEDURES
+#----------------------------------------
 
 def is_valid_path(argument: Any) -> bool:
-    return argument == root_path or (
+    return argument == ROOT_PATH or (
         isinstance(argument, str) and bool(
             PATH_PATTERN.fullmatch(argument)
         )

@@ -1,26 +1,27 @@
 from typing import Any, Optional
-from mezages.subjects import subject_placeholder
+from mezages.subjects import SUBJECT_PLACEHOLDER
 
 
-# ----------------------------------------
-# Type Aliases
-# ----------------------------------------
+#----------------------------------------
+# TYPE ALIASES
+#----------------------------------------
 
 Bucket = set[str]
 
 FormattedBucket = list[str]
 
-# ----------------------------------------
-# Exception Classes
-# ----------------------------------------
+
+#----------------------------------------
+# ERROR CLASSES
+#----------------------------------------
 
 class BucketError(Exception):
     pass
 
 
-# ----------------------------------------
-# Functions
-# ----------------------------------------
+#----------------------------------------
+# REUSABLE PROCEDURES
+#----------------------------------------
 
 def is_valid_bucket(argument: Any) -> bool:
     return type(argument) in (set, list, tuple) and not any(
@@ -38,8 +39,8 @@ def format_bucket(bucket: Bucket, subject_substitute: Optional[str]) -> Formatte
     formatted_bucket: set[str] = set()
 
     for message in bucket:
-        if message.startswith(subject_placeholder):
-            message = message.replace(subject_placeholder, subject_substitute or str(), 1).strip()
+        if message.startswith(SUBJECT_PLACEHOLDER):
+            message = message.replace(SUBJECT_PLACEHOLDER, subject_substitute or str(), 1).strip()
             # [NOTE] Edge case is when it is undesired for us to uppercase the first character
             if subject_substitute is None: message = f'{message[0].upper()}{message[1:]}'
 

@@ -1,8 +1,6 @@
-from mezages.sack import Sack
-from mezages.paths import root_path
 from tests.base_case import BaseCase
 from mezages.states import StateError
-from mezages.subjects import subject_placeholder
+from mezages import Sack, ROOT_PATH, SUBJECT_PLACEHOLDER
 
 
 class TestInit(BaseCase):
@@ -18,11 +16,11 @@ class TestInit(BaseCase):
         '''it starts with a good state when a valid initial state is provided'''
 
         init_state = {
-            root_path: [f'{subject_placeholder} must contain only 5 characters'],
-            'gender': {f'{subject_placeholder} is not a valid gender string'},
+            ROOT_PATH: [f'{SUBJECT_PLACEHOLDER} must contain only 5 characters'],
+            'gender': {f'{SUBJECT_PLACEHOLDER} is not a valid gender string'},
             'data.email': (
-                f'{subject_placeholder} is not a valid email address',
-                f'{subject_placeholder} must have the gmail domain'
+                f'{SUBJECT_PLACEHOLDER} is not a valid email address',
+                f'{SUBJECT_PLACEHOLDER} must have the gmail domain'
             ),
         }
 
@@ -35,16 +33,16 @@ class TestInit(BaseCase):
 
         with self.assertRaises(StateError) as error:
             Sack({
-                root_path: 'some invalid message bucket',
-                'gender': {f'{subject_placeholder} is not a valid gender string'},
-                'data.email': (5, f'{subject_placeholder} must have the gmail domain'),
+                ROOT_PATH: 'some invalid message bucket',
+                'gender': {f'{SUBJECT_PLACEHOLDER} is not a valid gender string'},
+                'data.email': (5, f'{SUBJECT_PLACEHOLDER} must have the gmail domain'),
             })
 
         failures = error.exception.data['failures']
 
         self.assertCountEqual(failures, {
             "'data.email' is mapped to an invalid bucket",
-            f'{repr(root_path)} is mapped to an invalid bucket',
+            f'{repr(ROOT_PATH)} is mapped to an invalid bucket',
         })
 
 
@@ -53,11 +51,11 @@ class TestProperties(BaseCase):
 
     def setUp(self):
         self.sack = Sack({
-            root_path: [f'{subject_placeholder} must contain only 5 characters'],
-            'gender': {f'{subject_placeholder} is not a valid gender string'},
+            ROOT_PATH: [f'{SUBJECT_PLACEHOLDER} must contain only 5 characters'],
+            'gender': {f'{SUBJECT_PLACEHOLDER} is not a valid gender string'},
             'data.{email}': (
-                f'{subject_placeholder} must have the gmail domain',
-                f'{subject_placeholder} is not a valid email address',
+                f'{SUBJECT_PLACEHOLDER} must have the gmail domain',
+                f'{SUBJECT_PLACEHOLDER} is not a valid email address',
             ),
         })
 
@@ -75,7 +73,7 @@ class TestProperties(BaseCase):
         '''it returns a dict of paths to lists of formatted messages for an entire sack'''
 
         return self.assertDictDeepEqual(self.sack.map, {
-            root_path: ['Must contain only 5 characters'],
+            ROOT_PATH: ['Must contain only 5 characters'],
             'gender': ['Is not a valid gender string'],
             'data.{email}': [
                 'data.{email} must have the gmail domain',

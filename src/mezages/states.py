@@ -3,18 +3,18 @@ from mezages.paths import is_valid_path
 from mezages.buckets import is_valid_bucket, Bucket, FormattedBucket
 
 
-# ----------------------------------------
-# Type Aliases
-# ----------------------------------------
+#----------------------------------------
+# TYPE ALIASES
+#----------------------------------------
 
 State = dict[str, Bucket]
 
 FormattedState = dict[str, FormattedBucket]
 
 
-# ----------------------------------------
-# Exception Classes
-# ----------------------------------------
+#----------------------------------------
+# ERROR CLASSES
+#----------------------------------------
 
 class StateError(Exception):
     def __init__(self, message: str, **kwargs: Any):
@@ -22,9 +22,9 @@ class StateError(Exception):
         self.data = {**kwargs, message: message}
 
 
-# ----------------------------------------
-# Functions
-# ----------------------------------------
+#----------------------------------------
+# REUSABLE PROCEDURES
+#----------------------------------------
 
 def validate_state(argument: Any) -> set[str]:
     if not isinstance(argument, dict):
@@ -55,7 +55,7 @@ def ensure_state(argument: Any) -> State:
         return dict((key, set(value)) for key, value in argument.items())
 
     message = '\n'.join([
-        'Encountered some state issues\n',
+        'Encountered some state errors\n',
         *[f'\t[!] {failure}' for failure in failures],
         '',
     ])

@@ -1,3 +1,3 @@
 from .sack import Sack as Sack  # noqa #??
-from .paths import root_path as root_path  # noqa
-from .subjects import subject_placeholder as subject_placeholder  # noqa
+from .paths import ROOT_PATH as ROOT_PATH  # noqa
+from .subjects import SUBJECT_PLACEHOLDER as SUBJECT_PLACEHOLDER  # noqa
