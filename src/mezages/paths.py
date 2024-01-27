@@ -15,13 +15,15 @@ TokenType = Literal['key'] | Literal['index'] | Literal['unknown']
 
 ROOT_PATH = '%root%'
 
-TOKEN_REGEX = r'(?:[^\.]+)'
-
 KEY_TOKEN_REGEX = r'(?:\{[a-z0-9_]+\})'
 KEY_TOKEN_PATTERN = re.compile(KEY_TOKEN_REGEX)
 
 INDEX_TOKEN_REGEX = r'(?:\[\d+\])'
 INDEX_TOKEN_PATTERN = re.compile(INDEX_TOKEN_REGEX)
+
+UNKNOWN_TOKEN_REGEX = '(?:[a-z0-9_]+)'
+
+TOKEN_REGEX = f'(?:{KEY_TOKEN_REGEX}|{INDEX_TOKEN_REGEX}|{UNKNOWN_TOKEN_REGEX})'
 
 PATH_PATTERN = re.compile(fr'(?:(?:{TOKEN_REGEX}\.)*{TOKEN_REGEX})')
 
