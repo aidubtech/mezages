@@ -1,23 +1,23 @@
 from typing import Any
-from mezages.subject import Subject
-from mezages.bucket import OutputMessages
-from mezages.store import Store, OutputStore
+from mezages.subjects import get_subject_substitute
+from mezages.states import ensure_state, FormattedState
+from mezages.buckets import FormattedBucket, format_bucket
 
 
 class Sack:
-    def __init__(self, init_store: Any = dict()) -> None:
-        self.__store = Store(init_store)
+    def __init__(self, init_state: Any = dict()) -> None:
+        self.__state = ensure_state(init_state)
 
     @property
-    def all(self) -> OutputMessages:
-        return list(message for messages in self.map.values() for message in messages)
+    def all(self) -> FormattedBucket:
+        return list(message for bucket in self.map.values() for message in bucket)
 
     @property
-    def map(self) -> OutputStore:
-        output_store: OutputStore = dict()
+    def map(self) -> FormattedState:
+        formatted_state: FormattedState = dict()
 
-        for path, bucket in self.__store.items():
-            subject_substitute = Subject.get_substitute(path, self.__store)
-            output_store[path] = bucket.format(subject_substitute)
+        for path, bucket in self.__state.items():
+            subject_substitute = get_subject_substitute(path, self.__state)
+            formatted_state[str(path)] = format_bucket(bucket, subject_substitute)
 
-        return output_store
+        return formatted_state

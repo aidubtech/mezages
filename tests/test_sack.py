@@ -1,23 +1,23 @@
 from mezages.sack import Sack
-from mezages.path import root_path
-from mezages.store import StoreError
+from mezages.paths import root_path
 from tests.base_case import BaseCase
-from mezages.subject import subject_placeholder
+from mezages.states import StateError
+from mezages.subjects import subject_placeholder
 
 
 class TestInit(BaseCase):
     '''when creating new instances of the sack class'''
 
-    def test_with_no_input_store(self):
-        '''it starts with an empty store when no input store is provided'''
+    def test_with_no_init_state(self):
+        '''it starts with an empty state when no initial state is provided'''
 
         sack = Sack()
-        self.assertEqual(self.get_sack_store(sack), dict())
+        self.assertEqual(self.get_sack_state(sack), dict())
 
-    def test_with_a_valid_input_store(self):
-        '''it starts with a good store when a valid input store is provided'''
+    def test_with_a_valid_init_state(self):
+        '''it starts with a good state when a valid initial state is provided'''
 
-        input_store = {
+        init_state = {
             root_path: [f'{subject_placeholder} must contain only 5 characters'],
             'gender': {f'{subject_placeholder} is not a valid gender string'},
             'data.email': (
@@ -26,14 +26,14 @@ class TestInit(BaseCase):
             ),
         }
 
-        sack = Sack(input_store)
-        expected_store = self.get_sack_store(sack)
-        self.assertMatchStore(input_store, expected_store)
+        sack = Sack(init_state)
+        expected_state = self.get_sack_state(sack)
+        self.assertMatchState(init_state, expected_state)
 
-    def test_with_an_invalid_input_store(self):
-        '''it raises a store error when an invalid input store is provided'''
+    def test_with_an_invalid_init_state(self):
+        '''it raises a state error when an invalid init state is provided'''
 
-        with self.assertRaises(StoreError) as error:
+        with self.assertRaises(StateError) as error:
             Sack({
                 root_path: 'some invalid message bucket',
                 'gender': {f'{subject_placeholder} is not a valid gender string'},
