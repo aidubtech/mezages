@@ -74,22 +74,11 @@ class TestProperties(BaseCase):
     def test_the_map_property(self):
         '''it returns a dict of paths to lists of formatted messages for an entire sack'''
 
-        result = self.sack.map
-
-        # Extract the below into a custom assert method
-
-        expected_result_keys = [root_path, 'gender', 'data.{email}']
-        self.assertCountEqual(list(result.keys()), expected_result_keys)
-
-        for path, messages in result.items():
-            if path == root_path:
-                self.assertCountEqual(messages, ['Must contain only 5 characters'])
-
-            if path == 'gender':
-                self.assertCountEqual(messages, ['Is not a valid gender string'])
-
-            if path == 'data.{email}':
-                self.assertCountEqual(messages, [
-                    'data.{email} must have the gmail domain',
-                    'data.{email} is not a valid email address',
-                ])
+        return self.assertDictDeepEqual(self.sack.map, {
+            root_path: ['Must contain only 5 characters'],
+            'gender': ['Is not a valid gender string'],
+            'data.{email}': [
+                'data.{email} must have the gmail domain',
+                'data.{email} is not a valid email address',
+            ],
+        })
