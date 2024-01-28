@@ -80,3 +80,105 @@ class TestProperties(BaseCase):
                 'data.{email} is not a valid email address',
             ],
         })
+
+
+class TestUnionMethod(BaseCase):
+    '''Tests for the union method in the Sack class'''
+
+    def setUp(self):
+        self.sack = Sack({
+            ROOT_PATH: [f'{SUBJECT_PLACEHOLDER} must contain only 5 characters'],
+            'gender': {f'{SUBJECT_PLACEHOLDER} is not a valid gender string'},
+            'data.{email}': (
+                f'{SUBJECT_PLACEHOLDER} must have the gmail domain',
+                f'{SUBJECT_PLACEHOLDER} is not a valid email address',
+            ),
+        })
+
+    def test_union_with_empty_store(self):
+        '''it handles an empty input store'''
+
+        store_to_union = {}
+
+        self.sack.union(store_to_union)
+
+        expected_results = {
+            '%root%': ['Must contain only 5 characters'],
+            'gender': ['Is not a valid gender string'],
+            'data.{email}': ['data.{email} is not a valid email address', 'data.{email} must have the gmail domain']
+        }
+
+        self.assertDictEqual(self.sack.map, expected_results)
+
+    def test_union_with_invalid_store(self):
+        '''it handles an invalid input store'''
+
+        with self.assertRaises(StateError) as error:
+            Sack({
+                ROOT_PATH: 'some invalid message bucket',
+                'gender': {f'{SUBJECT_PLACEHOLDER} is not a valid gender string'},
+                'data.email': (5, f'{SUBJECT_PLACEHOLDER} must have the gmail domain'),
+            })
+
+        failures = error.exception.data['failures']
+
+        self.assertCountEqual(failures, {
+            "'data.email' is mapped to an invalid bucket",
+            f'{repr(ROOT_PATH)} is mapped to an invalid bucket',
+        })
+
+    def test_union_with_invalid_path(self):
+        '''it handles an invalid path'''
+
+        with self.assertRaises(StateError) as error:
+            Sack({
+                '.gender': {f'{SUBJECT_PLACEHOLDER} is not a valid gender string'},
+                # 'data.email.': {f'{SUBJECT_PLACEHOLDER} must have the gmail domain'},
+            })
+
+        failures = error.exception.data['failures']
+
+        self.assertCountEqual(failures, {
+            "'.gender' is an invalid path",
+        })
+
+    def test_union_without_mount_path(self):
+        '''it unifies messages from store without a mount point'''
+
+        store_to_union = {
+            'data.username': (f'{SUBJECT_PLACEHOLDER} is not a valid username',),
+            'data.password': (f'{SUBJECT_PLACEHOLDER} is not a valid password',),
+        }
+
+        expected_results = {
+            '%root%': ['Must contain only 5 characters'],
+            'gender': ['Is not a valid gender string'],
+            'data.{email}': ['data.{email} is not a valid email address', 'data.{email} must have the gmail domain'],
+            'data.username': ['data.username is not a valid username'],
+            'data.password': ['data.password is not a valid password']
+        }
+
+        self.sack.union(store_to_union)
+
+        self.assertDictEqual(self.sack.map, expected_results)
+
+    def test_union_with_mount_path(self):
+        '''it unifies from store with a mount point'''
+
+        store_to_union = {
+            'data.username': (f'{SUBJECT_PLACEHOLDER} is not a valid username',),
+            'data.password': (f'{SUBJECT_PLACEHOLDER} is not a valid password',),
+        }
+
+        expected_results = {
+            '%root%': ['Must contain only 5 characters'],
+            'gender': ['Is not a valid gender string'],
+            'data.{email}': ['data.{email} is not a valid email address', 'data.{email} must have the gmail domain'],
+            'user.data.username': ['Is not a valid username'],
+            'user.data.password': ['Is not a valid password']
+        }
+
+        self.sack.union(store_to_union, mount_path='user')
+
+        # Assert specific elements
+        self.assertDictEqual(self.sack.map, expected_results)
