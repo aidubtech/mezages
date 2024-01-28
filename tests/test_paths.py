@@ -26,7 +26,7 @@ class TestIsValidPath(BaseCase):
 
 
 class TestEnsurePath(BaseCase):
-    '''when ensuring that a valid is indeed a path'''
+    '''when ensuring that a value is indeed a path'''
 
     def test_with_a_valid_value(self):
         '''it returns back the path if it is valid'''
