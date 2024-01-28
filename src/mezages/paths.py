@@ -1,12 +1,12 @@
-import re
-from typing import Any, Literal
+from re import compile
+from typing import Any, Literal, Optional
 
 
 #----------------------------------------
 # TYPE ALIASES
 #----------------------------------------
 
-TokenType = Literal['key'] | Literal['index'] | Literal['unknown']
+TokenType = Literal['key'] | Literal['index']
 
 
 #----------------------------------------
@@ -16,16 +16,16 @@ TokenType = Literal['key'] | Literal['index'] | Literal['unknown']
 ROOT_PATH = '%root%'
 
 KEY_TOKEN_REGEX = r'(?:\{[a-z0-9_]+\})'
-KEY_TOKEN_PATTERN = re.compile(KEY_TOKEN_REGEX)
+KEY_TOKEN_PATTERN = compile(KEY_TOKEN_REGEX)
 
 INDEX_TOKEN_REGEX = r'(?:\[\d+\])'
-INDEX_TOKEN_PATTERN = re.compile(INDEX_TOKEN_REGEX)
+INDEX_TOKEN_PATTERN = compile(INDEX_TOKEN_REGEX)
 
 UNKNOWN_TOKEN_REGEX = '(?:[a-z0-9_]+)'
 
 TOKEN_REGEX = f'(?:{KEY_TOKEN_REGEX}|{INDEX_TOKEN_REGEX}|{UNKNOWN_TOKEN_REGEX})'
 
-PATH_PATTERN = re.compile(fr'(?:(?:{TOKEN_REGEX}\.)*{TOKEN_REGEX})')
+PATH_PATTERN = compile(fr'(?:(?:{TOKEN_REGEX}\.)*{TOKEN_REGEX})')
 
 
 #----------------------------------------
@@ -53,7 +53,6 @@ def ensure_path(argument: Any) -> str:
     raise PathError(f'{repr(argument)} is an invalid path')
 
 
-def get_token_type(token: str) -> TokenType:
+def get_token_type(token: str) -> Optional[TokenType]:
     if bool(KEY_TOKEN_PATTERN.fullmatch(token)): return 'key'
     if bool(INDEX_TOKEN_PATTERN.fullmatch(token)): return 'index'
-    return 'unknown'

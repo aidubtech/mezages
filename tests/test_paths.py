@@ -66,6 +66,6 @@ class TestGetTokenType(BaseCase):
     def test_unknown_type_token(self):
         '''it returns `unknown` for tokens of unknown type'''
 
-        self.assertEqual(get_token_type('_'), 'unknown')
-        self.assertEqual(get_token_type('10'), 'unknown')
-        self.assertEqual(get_token_type('data'), 'unknown')
+        self.assertEqual(get_token_type('_'), None)
+        self.assertEqual(get_token_type('10'), None)
+        self.assertEqual(get_token_type('data'), None)
