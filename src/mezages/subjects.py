@@ -1,5 +1,5 @@
 from typing import TYPE_CHECKING, Literal, Optional
-from mezages.paths import ROOT_PATH, get_token_type, TokenType
+from mezages.paths import get_token_type, ROOT_PATH, TokenType
 
 if TYPE_CHECKING:
     from mezages.states import State
@@ -9,9 +9,7 @@ if TYPE_CHECKING:
 # TYPE ALIASES
 #----------------------------------------
 
-SubjectType = Literal['scion'] | Literal['array'] | Literal['record']
-
-SubjectLineageTypes = tuple[Optional[SubjectType], ...]
+SubjectType = Literal['array'] | Literal['record']
 
 
 #----------------------------------------
@@ -39,45 +37,34 @@ def get_subject_first_child_path(path: str, state: 'State') -> Optional[str]:
     except StopIteration: return None
 
 
-def get_subject_lineage_types(path: str, state: 'State') -> SubjectLineageTypes:
-    subject_lineage_types: list[Optional[SubjectType]] = list()
+def get_subject_type(path: str, state: 'State', child_path: Optional[str] = None):
+    child_path_valid = child_path is not None and child_path != path and child_path in state
+    child_path = child_path if child_path_valid else get_subject_first_child_path(path, state)
 
-    prev_path = None
+    if not child_path: return None
 
-    for token in path.split('.'):
-        next_path = f'{prev_path}.{token}' if prev_path else token
+    child_sub_path = child_path[len(f'{path}.'):]
+    sub_path_first_token = child_sub_path.split('.')[0]
+    sub_path_first_token_type = get_token_type(sub_path_first_token)
 
-        next_path_type: Optional[SubjectType] = None
+    if not sub_path_first_token_type: return None
+    return TOKEN_SUBJECT_TYPE_MAP[sub_path_first_token_type]
 
-        if any_child_path := get_subject_first_child_path(next_path, state):
-            child_sub_path = any_child_path[len(f'{next_path}.'):]
-            sub_path_first_token = child_sub_path.split('.')[0]
-            sub_path_first_token_type = get_token_type(sub_path_first_token)
 
-            next_path_type = (
-                None if not sub_path_first_token_type
-                else TOKEN_SUBJECT_TYPE_MAP.get(sub_path_first_token_type)
-            )
-
-        parent_type_is_known = (
-            subject_lineage_types and (
-                subject_lineage_types[-1] not in (None, 'scion')
-            )
-        )
-
-        is_scion_type = not next_path_type and parent_type_is_known
-        subject_lineage_types.append('scion' if is_scion_type else next_path_type)
-
-        prev_path = next_path
-
-    return tuple(subject_lineage_types)
+def get_subject_parent_type(path: str, state: 'State'):
+    parent_path = '.'.join(path.split('.')[:-1])
+    if not parent_path: return None
+    return get_subject_type(parent_path, state, path)
 
 
 def get_subject_substitute(path: str, state: 'State') -> Optional[str]:
     if path == ROOT_PATH: return None
 
-    path_type = get_subject_lineage_types(path, state)[-1]
-    if not path_type: return None
+    subject_type = get_subject_type(path, state)
+    subject_parent_type = get_subject_parent_type(path, state)
+
+    if not subject_type and not subject_parent_type:
+        return None
 
     # Add better array subject substitute logic here
     # Add better record subject substitute logic here
