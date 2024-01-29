@@ -1,12 +1,22 @@
-from typing import Any
+from copy import deepcopy
+from typing import Any, Optional
+from mezages.paths import ensure_path, ROOT_PATH
 from mezages.subjects import get_subject_substitute
-from mezages.states import ensure_state, FormattedState
 from mezages.buckets import FormattedBucket, format_bucket
+from mezages.states import State, ensure_state, FormattedState
+
+
+class SackError(Exception):
+    pass
 
 
 class Sack:
     def __init__(self, init_state: Any = dict()) -> None:
         self.__state = ensure_state(init_state)
+
+    @property
+    def state(self) -> State:
+        return deepcopy(self.__state)
 
     @property
     def all(self) -> FormattedBucket:
@@ -21,3 +31,19 @@ class Sack:
             formatted_state[str(path)] = format_bucket(bucket, subject_substitute)
 
         return formatted_state
+
+    def merge(self, state: State, mount_path: Optional[str] = None) -> None:
+        state = ensure_state(state)
+        if mount_path: ensure_path(mount_path)
+
+        for path, bucket in state.items():
+            new_path = path
+
+            if mount_path:
+                if path == ROOT_PATH:
+                    new_path = mount_path
+                else:
+                    new_path = f'{mount_path}.{path}'
+
+            previous_bucket = self.__state.get(new_path, set())
+            self.__state[new_path] = previous_bucket.union(bucket)

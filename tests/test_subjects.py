@@ -45,7 +45,6 @@ class TestSubjects(BaseCase):
         self.assertEqual(get_subject_type('user.{roles}', self.state, 'user.{roles}.[0]'), 'array')
         self.assertEqual(get_subject_type('user.{roles}', self.state, 'user.{roles}.[10]'), 'array')
 
-    
     def test_get_subject_parent_type(self):
         '''it returns a type string or none for the subject's parent'''
 
