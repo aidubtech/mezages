@@ -36,8 +36,5 @@ class Sack:
         for path, bucket in store.items():
             new_path = f'{mount_path}.{path}' if mount_path else path
 
-            if new_path in self.__state:
-                self.__state[new_path] = self.__state[new_path].union(bucket)
-                continue
-
-            self.__state[new_path] = bucket
+            previous_bucket = self.__state.get(new_path, set())
+            self.__state[new_path] = previous_bucket.union(bucket)
