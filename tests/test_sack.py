@@ -1,5 +1,7 @@
+from typing import cast
+from mezages.paths import PathError
 from tests.base_case import BaseCase
-from mezages.states import StateError
+from mezages.states import State, StateError
 from mezages import Sack, ROOT_PATH, SUBJECT_PLACEHOLDER
 
 
@@ -9,8 +11,7 @@ class TestInit(BaseCase):
     def test_with_no_init_state(self):
         '''it starts with an empty state when no initial state is provided'''
 
-        sack = Sack()
-        self.assertEqual(self.get_sack_state(sack), dict())
+        self.assertEqual(Sack().state, dict())
 
     def test_with_a_valid_init_state(self):
         '''it starts with a good state when a valid initial state is provided'''
@@ -25,8 +26,7 @@ class TestInit(BaseCase):
         }
 
         sack = Sack(init_state)
-        expected_state = self.get_sack_state(sack)
-        self.assertMatchState(init_state, expected_state)
+        self.assertMatchState(init_state, sack.state)
 
     def test_with_an_invalid_init_state(self):
         '''it raises a state error when an invalid init state is provided'''
@@ -59,6 +59,15 @@ class TestProperties(BaseCase):
             ),
         })
 
+    def test_the_state_property(self):
+        '''it returns a copy of the private state within a sack'''
+
+        copy_state = self.sack.state
+        private_state = getattr(self.sack, '_Sack__state')
+
+        self.assertDictDeepEqual(copy_state, private_state)
+        self.assertNotEqual(id(copy_state), id(private_state))
+
     def test_the_all_property(self):
         '''it returns a flat list of formatted messages for an entire sack'''
 
@@ -82,43 +91,37 @@ class TestProperties(BaseCase):
         })
 
 
-class TestUnionMethod(BaseCase):
-    '''Tests for the union method in the Sack class'''
+class TestMerge(BaseCase):
+    '''when merging a state with a sack state'''
 
     def setUp(self):
         self.sack = Sack({
-            ROOT_PATH: [f'{SUBJECT_PLACEHOLDER} must contain only 5 characters'],
-            'gender': {f'{SUBJECT_PLACEHOLDER} is not a valid gender string'},
-            'data.{email}': (
-                f'{SUBJECT_PLACEHOLDER} must have the gmail domain',
-                f'{SUBJECT_PLACEHOLDER} is not a valid email address',
-            ),
+            ROOT_PATH: [f'{SUBJECT_PLACEHOLDER} must contain only 5 chars'],
+            'gender': {f'{SUBJECT_PLACEHOLDER} is not a valid gender'},
+            'data.{email}': ('This is not a valid email address',)
         })
 
-    def test_union_with_empty_store(self):
-        '''it handles an empty input store'''
+    def test_with_empty_state(self):
+        '''it leaves the sack state unchanged'''
 
-        store_to_union = {}
+        self.sack.merge(dict())
 
-        self.sack.union(store_to_union)
+        self.assertDictDeepEqual(self.sack.state, {
+            ROOT_PATH: {f'{SUBJECT_PLACEHOLDER} must contain only 5 chars'},
+            'gender': {f'{SUBJECT_PLACEHOLDER} is not a valid gender'},
+            'data.{email}': {'This is not a valid email address'},
+        })
 
-        expected_results = {
-            '%root%': ['Must contain only 5 characters'],
-            'gender': ['Is not a valid gender string'],
-            'data.{email}': ['data.{email} is not a valid email address', 'data.{email} must have the gmail domain']
-        }
+    def test_with_invalid_state(self):
+        '''it raises an error with validation failures'''
 
-        self.assertDictEqual(self.sack.map, expected_results)
-
-    def test_union_with_invalid_store(self):
-        '''it handles an invalid input store'''
+        invalid_state = cast(State, {
+            ROOT_PATH: 'some invalid message bucket',
+            'data.email': (5, 'Must have the gmail domain'),
+        })
 
         with self.assertRaises(StateError) as error:
-            Sack({
-                ROOT_PATH: 'some invalid message bucket',
-                'gender': {f'{SUBJECT_PLACEHOLDER} is not a valid gender string'},
-                'data.email': (5, f'{SUBJECT_PLACEHOLDER} must have the gmail domain'),
-            })
+            self.sack.merge(invalid_state)
 
         failures = error.exception.data['failures']
 
@@ -127,58 +130,51 @@ class TestUnionMethod(BaseCase):
             f'{repr(ROOT_PATH)} is mapped to an invalid bucket',
         })
 
-    def test_union_with_invalid_path(self):
-        '''it handles an invalid path'''
+    def test_with_invalid_mount_path(self):
+        '''it raises an error about the invalid mount path'''
 
-        with self.assertRaises(StateError) as error:
-            Sack({
-                '.gender': {f'{SUBJECT_PLACEHOLDER} is not a valid gender string'},
-                # 'data.email.': {f'{SUBJECT_PLACEHOLDER} must have the gmail domain'},
-            })
+        with self.assertRaises(PathError) as error:
+            self.sack.merge(dict(), mount_path='users.[i]')
 
-        failures = error.exception.data['failures']
+        expected_message = "'users.[i]' is an invalid path"
+        self.assertEqual(str(error.exception), expected_message)
 
-        self.assertCountEqual(failures, {
-            "'.gender' is an invalid path",
+    def test_with_no_mount_path(self):
+        '''it merges state into sack with child paths unprefixed'''
+
+        new_state = cast(State, {
+            ROOT_PATH: ['This is a complete message for root subject'],
+            'data.{name}': {f'{SUBJECT_PLACEHOLDER} must be a string value'},
         })
 
-    def test_union_without_mount_path(self):
-        '''it unifies messages from store without a mount point'''
+        self.sack.merge(new_state)
 
-        store_to_union = {
-            'data.username': (f'{SUBJECT_PLACEHOLDER} is not a valid username',),
-            'data.password': (f'{SUBJECT_PLACEHOLDER} is not a valid password',),
-        }
+        self.assertDictDeepEqual(self.sack.state, {
+            ROOT_PATH: {
+                'This is a complete message for root subject',
+                f'{SUBJECT_PLACEHOLDER} must contain only 5 chars'
+            },
+            'gender': {f'{SUBJECT_PLACEHOLDER} is not a valid gender'},
+            'data.{email}': {'This is not a valid email address'},
+            'data.{name}': {f'{SUBJECT_PLACEHOLDER} must be a string value'},
+        })
 
-        expected_results = {
-            '%root%': ['Must contain only 5 characters'],
-            'gender': ['Is not a valid gender string'],
-            'data.{email}': ['data.{email} is not a valid email address', 'data.{email} must have the gmail domain'],
-            'data.username': ['data.username is not a valid username'],
-            'data.password': ['data.password is not a valid password']
-        }
+    def test_with_mount_path(self):
+        '''it merges state into sack with child paths prefixed'''
 
-        self.sack.union(store_to_union)
+        new_state = cast(State, {
+            ROOT_PATH: ['This is a complete message for new data'],
+            '{email}': {f'{SUBJECT_PLACEHOLDER} must be registered'},
+        })
 
-        self.assertDictEqual(self.sack.map, expected_results)
+        self.sack.merge(new_state, 'data')
 
-    def test_union_with_mount_path(self):
-        '''it unifies from store with a mount point'''
-
-        store_to_union = {
-            'data.username': (f'{SUBJECT_PLACEHOLDER} is not a valid username',),
-            'data.password': (f'{SUBJECT_PLACEHOLDER} is not a valid password',),
-        }
-
-        expected_results = {
-            '%root%': ['Must contain only 5 characters'],
-            'gender': ['Is not a valid gender string'],
-            'data.{email}': ['data.{email} is not a valid email address', 'data.{email} must have the gmail domain'],
-            'user.data.username': ['Is not a valid username'],
-            'user.data.password': ['Is not a valid password']
-        }
-
-        self.sack.union(store_to_union, mount_path='user')
-
-        # Assert specific elements
-        self.assertDictEqual(self.sack.map, expected_results)
+        self.assertDictDeepEqual(self.sack.state, {
+            ROOT_PATH: {f'{SUBJECT_PLACEHOLDER} must contain only 5 chars'},
+            'data': {'This is a complete message for new data'},
+            'gender': {f'{SUBJECT_PLACEHOLDER} is not a valid gender'},
+            'data.{email}': {
+                'This is not a valid email address',
+                f'{SUBJECT_PLACEHOLDER} must be registered',
+            }
+        })
