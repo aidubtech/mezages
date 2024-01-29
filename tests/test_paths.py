@@ -26,7 +26,7 @@ class TestIsValidPath(BaseCase):
 
 
 class TestEnsurePath(BaseCase):
-    '''when ensuring that a valid is indeed a path'''
+    '''when ensuring that a value is indeed a path'''
 
     def test_with_a_valid_value(self):
         '''it returns back the path if it is valid'''
@@ -66,6 +66,6 @@ class TestGetTokenType(BaseCase):
     def test_unknown_type_token(self):
         '''it returns `unknown` for tokens of unknown type'''
 
-        self.assertEqual(get_token_type('_'), 'unknown')
-        self.assertEqual(get_token_type('10'), 'unknown')
-        self.assertEqual(get_token_type('data'), 'unknown')
+        self.assertEqual(get_token_type('_'), None)
+        self.assertEqual(get_token_type('10'), None)
+        self.assertEqual(get_token_type('data'), None)
