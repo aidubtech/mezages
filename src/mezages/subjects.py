@@ -66,15 +66,9 @@ def get_subject_substitute(path: str, state: 'State') -> Optional[str]:
     if not subject_type and not subject_parent_type:
         return None
 
-    # Add better array subject substitute logic here
-
     if subject_parent_type == 'record':
-        key = path.split('.')[-1]  # extract the key from the path
-        parent_path = '.'.join(path.split('.')[:-1])  # get the parent path
-
-        if parent_path:
-            return f'{key} in {parent_path}'  # use <key> in <parent-path>
-        else:
-            return key  # if no parent use <key>
+        key = path.split('.')[-1]
+        parent_path = '.'.join(path.split('.')[:-1])
+        return f'{key} in {parent_path}' if parent_path else key
 
     return path
