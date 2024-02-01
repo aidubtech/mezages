@@ -3,7 +3,7 @@
 # https://github.com/DmytroLitvinov/awesome-flake8-extensions
 
 [flake8]
-ignore = E701, E265
+ignore = E701, E265, W503
 indent-size = 4
 max-line-length = 100
 literal-inline-quotes = single

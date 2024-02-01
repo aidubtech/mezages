@@ -1,7 +1,7 @@
 from typing import Any
 from unittest import TestCase
-from mezages.states import State
-from mezages.buckets import is_valid_bucket
+from mezages.sacks import SackState
+from mezages.buckets import is_bucket
 
 
 class BaseCase(TestCase):
@@ -10,14 +10,14 @@ class BaseCase(TestCase):
         (set, list, tuple): 'assertCountEqual',
     }
 
-    def assertMatchState(self, first: Any, state: State) -> None:
+    def assertMatchSackState(self, first: Any, sack_state: SackState) -> None:
         self.assertIsInstance(first, dict)
-        self.assertEqual(len(first), len(state))
+        self.assertEqual(len(first), len(sack_state))
 
         for key, value in first.items():
-            self.assertIn(key, state)
-            self.assertTrue(is_valid_bucket(value))
-            self.assertCountEqual(set(value), state[key])
+            self.assertIn(key, sack_state)
+            self.assertTrue(is_bucket(value))
+            self.assertCountEqual(set(value), sack_state[key])
 
     def assertDictDeepEqual(self, first: Any, second: Any) -> None:
         self.assertIsInstance(first, dict)

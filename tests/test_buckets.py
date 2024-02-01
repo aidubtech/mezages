@@ -1,31 +1,31 @@
 from tests.base_case import BaseCase
 
 from mezages.buckets import (
+    is_bucket,
     BucketError,
     ensure_bucket,
     format_bucket,
-    is_valid_bucket,
     SUBJECT_PLACEHOLDER,
 )
 
 
-class TestIsValidBucket(BaseCase):
-    '''when checking the validity of buckets'''
+class TestIsBucket(BaseCase):
+    '''when checking the validity of a bucket'''
 
     def test_with_a_valid_value(self):
         '''it returns true for valid buckets'''
 
-        self.assertTrue(is_valid_bucket([
+        self.assertTrue(is_bucket([
             'This is seen as a complete message',
             'This {subject} message is also complete',
         ]))
 
-        self.assertTrue(is_valid_bucket((
+        self.assertTrue(is_bucket((
             '{subject} message is a partial message',
             f'{SUBJECT_PLACEHOLDER} makes message partial',
         )))
 
-        self.assertTrue(is_valid_bucket({
+        self.assertTrue(is_bucket({
             'This subject placeholder {subject} will be ignored when formatting',
             f'{SUBJECT_PLACEHOLDER} will not be, but this {{subject}} will be ignored',
         }))
@@ -33,10 +33,10 @@ class TestIsValidBucket(BaseCase):
     def test_with_an_invalid_value(self):
         '''it returns false for invalid buckets'''
 
-        self.assertFalse(is_valid_bucket(1))
-        self.assertFalse(is_valid_bucket([1, 'some message here']))
-        self.assertFalse(is_valid_bucket('some message outside a collection'))
-        self.assertFalse(is_valid_bucket(('first message', ['Another message here'])))
+        self.assertFalse(is_bucket(1))
+        self.assertFalse(is_bucket([1, 'some message here']))
+        self.assertFalse(is_bucket('some message outside a collection'))
+        self.assertFalse(is_bucket(('first message', ['Another message here'])))
 
 
 class TestEnsureBucket(BaseCase):
@@ -59,12 +59,12 @@ class TestEnsureBucket(BaseCase):
         with self.assertRaises(BucketError) as error:
             ensure_bucket(bucket)
 
-        message = f'{repr(bucket)} is an invalid bucket'
+        message = 'Argument must be a valid bucket'
         self.assertEqual(str(error.exception), message)
 
 
 class TestFormatBucket(BaseCase):
-    '''when formatting buckets with different subject substitutes'''
+    '''when formatting a bucket with different subject substitutes'''
 
     def setUp(self):
         self.bucket = {

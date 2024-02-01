@@ -1,5 +1,5 @@
 from typing import Any, Optional
-from mezages.subjects import SUBJECT_PLACEHOLDER
+from mezages.paths import SUBJECT_PLACEHOLDER
 
 
 #----------------------------------------
@@ -12,7 +12,7 @@ FormattedBucket = list[str]
 
 
 #----------------------------------------
-# ERROR CLASSES
+# EXCEPTION CLASSES
 #----------------------------------------
 
 class BucketError(Exception):
@@ -20,19 +20,18 @@ class BucketError(Exception):
 
 
 #----------------------------------------
-# REUSABLE PROCEDURES
+# MODULE FUNCTIONS
 #----------------------------------------
 
-def is_valid_bucket(argument: Any) -> bool:
-    return type(argument) in (set, list, tuple) and not any(
-        not isinstance(message, str) for message in argument
+def is_bucket(argument: Any) -> bool:
+    return type(argument) in (set, list, tuple) and argument and not (
+        any(not isinstance(message, str) for message in argument)
     )
 
 
 def ensure_bucket(argument: Any) -> Bucket:
-    if is_valid_bucket(argument): return set(argument)
-    # Find a way to pretty print the structure this error
-    raise BucketError(f'{repr(argument)} is an invalid bucket')
+    if is_bucket(argument): return set(argument)
+    raise BucketError('Argument must be a valid bucket')
 
 
 def format_bucket(bucket: Bucket, subject_substitute: Optional[str]) -> FormattedBucket:
