@@ -65,7 +65,18 @@ def get_subject_substitute(path: str, state: 'State') -> Optional[str]:
 
     if not subject_type and not subject_parent_type:
         return None
-
     # Add better array subject substitute logic here
+    if subject_type == 'array':
+        parent_path = '.'.join(path.split('.')[:-1])
+        if parent_path:
+            if parent_path in state:
+                index = int(path.split('.')[-1].split('[')[-1].rstrip(']'))
+                if 0 <= index < len(state[parent_path]):
+                    return f"Item at index {index} in {parent_path}"
+                else:
+                    return f"Item at index {index}"
+    
     # Add better record subject substitute logic here
     return path
+
+
