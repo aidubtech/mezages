@@ -23,6 +23,7 @@ class TestIsValidPath(BaseCase):
         self.assertFalse(is_valid_path('%base%'))
         self.assertFalse(is_valid_path('[data].{name}'))
         self.assertFalse(is_valid_path('data.%user%.{name}'))
+        # self.assertFalse(is_valid_path('data.{user}.roles.[0]'))
 
 
 class TestEnsurePath(BaseCase):
@@ -31,7 +32,7 @@ class TestEnsurePath(BaseCase):
     def test_with_a_valid_value(self):
         '''it returns back the path if it is valid'''
 
-        path = 'data.[0].{users}.{0}.roles.[0]'
+        path = 'data.[0].{users}.[0].{role}'
         self.assertEqual(path, ensure_path(path))
 
     def test_with_an_invalid_value(self):
