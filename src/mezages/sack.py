@@ -34,16 +34,15 @@ class Sack:
 
     def merge(self, state: State, mount_path: Optional[str] = None) -> None:
         state = ensure_state(state)
-        if mount_path: ensure_path(mount_path)
+
+        if mount_path:
+            ensure_path(mount_path)
 
         for path, bucket in state.items():
-            new_path = path
-
-            if mount_path:
-                if path == ROOT_PATH:
-                    new_path = mount_path
-                else:
-                    new_path = f'{mount_path}.{path}'
-
+            new_path = path if not mount_path else (
+                mount_path
+                if path == ROOT_PATH
+                else f'{mount_path}.{path}'
+            )
             previous_bucket = self.__state.get(new_path, set())
             self.__state[new_path] = previous_bucket.union(bucket)
