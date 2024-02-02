@@ -47,3 +47,21 @@ class Sack:
 
             previous_bucket = self.__state.get(new_path, set())
             self.__state[new_path] = previous_bucket.union(bucket)
+
+    def mount(self, path: str) -> None:
+
+        ensure_path(path)
+
+        new_state = {}
+
+        for old_path, bucket in self.__state.items():
+            new_path = old_path
+
+            if new_path == ROOT_PATH or path == ROOT_PATH:
+                new_path = path
+            else:
+                new_path = f'{path}.{old_path}'
+
+            new_state[new_path] = bucket
+
+        self.__state = new_state
