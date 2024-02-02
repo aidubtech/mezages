@@ -73,4 +73,18 @@ def get_subject_substitute(path: str, state: 'State') -> Optional[str]:
 
         return f'{prop} in {parent_type}' if parent_type else prop
 
+    if subject_parent_type == 'array':
+        tokens = path.split('.')
+        parent_path = '.'.join(tokens[:-1])
+        index = tokens[-1].strip('[]')
+        subtitute = f'Item at index {index}'
+
+
+        return f'{subtitute} in {parent_path}' if parent_path else subtitute
+
+
     return path
+
+
+
+
