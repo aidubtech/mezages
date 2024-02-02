@@ -178,3 +178,37 @@ class TestMerge(BaseCase):
                 f'{SUBJECT_PLACEHOLDER} must be registered',
             }
         })
+
+
+class TestMount(BaseCase):
+    '''when mounting a path to a sack state'''
+
+    def setUp(self):
+        self.sack = Sack({
+            ROOT_PATH: [f'{SUBJECT_PLACEHOLDER} must contain only 5 chars'],
+            'gender': {f'{SUBJECT_PLACEHOLDER} is not a valid gender'},
+            'data.{email}': ('This is not a valid email address',)
+        })
+
+    def test_mount_renames_root_path(self):
+        '''it renames the root path'''
+
+        self.sack.mount('user')
+
+        self.assertEqual(self.sack.map, {
+            'user': ['Must contain only 5 chars'],
+            'user.gender': ['Is not a valid gender'],
+            'user.data.{email}': ['This is not a valid email address'],
+        }
+        )
+
+    def test_mount_prefixes_child_path(self):
+        '''it prefixes the child path with the root path'''
+
+        self.sack.mount('dataset')
+
+        self.assertEqual(self.sack.map, {
+            'dataset': ['Must contain only 5 chars'],
+            'dataset.gender': ['Is not a valid gender'],
+            'dataset.data.{email}': ['This is not a valid email address']}
+        )
