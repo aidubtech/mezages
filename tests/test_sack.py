@@ -1,5 +1,6 @@
 from typing import cast
 from mezages.paths import PathError
+from mezages.subjects import get_subject_substitute
 from tests.base_case import BaseCase
 from mezages.states import State, StateError
 from mezages import Sack, ROOT_PATH, SUBJECT_PLACEHOLDER
@@ -212,3 +213,36 @@ class TestMount(BaseCase):
             'dataset.gender': ['Is not a valid gender'],
             'dataset.data.{email}': ['This is not a valid email address']}
         )
+
+    def test_mount_preserves_substitute(self):
+        '''it ensures the subject substitute maintain it path linages'''
+
+        self.instance = Sack({
+            ROOT_PATH: {f'{SUBJECT_PLACEHOLDER} message'},
+            'user.{name}': {'message'},
+        })
+        self.instance.mount('data')
+
+        self.assertEqual(get_subject_substitute(
+            'data.user.{name}', self.instance.state), 'name in data.user')
+
+    def test_mount_handle_invalid_path(self):
+        '''it raises error with validation failure'''
+
+        with self.assertRaises(PathError) as error:
+            self.sack.mount('')
+
+        expected_message = "'' is an invalid path"
+
+        self.assertEqual(str(error.exception), expected_message)
+
+    def test_mount_root_path(self):
+        '''it mount the root path, when the mount is equal to the ROOT_PATH'''
+
+        self.sack.mount('%root%')
+
+        self.assertEqual(self.sack.map, {
+            '%root%': ['Must contain only 5 chars'],
+            '%root%.gender': ['Is not a valid gender'],
+            '%root%.data.{email}': ['This is not a valid email address']
+        })

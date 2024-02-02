@@ -57,7 +57,7 @@ class Sack:
         for old_path, bucket in self.__state.items():
             new_path = old_path
 
-            if new_path == ROOT_PATH or path == ROOT_PATH:
+            if new_path == ROOT_PATH:
                 new_path = path
             else:
                 new_path = f'{path}.{old_path}'
