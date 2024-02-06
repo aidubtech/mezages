@@ -59,7 +59,7 @@ class TestSubjects(BaseCase):
 
         self.assertEqual(get_subject_substitute(ROOT_PATH, self.state), None)
         self.assertEqual(get_subject_substitute('user', self.state), 'user')
-        self.assertEqual(get_subject_substitute('user.{name}', self.state), 'name in user')
-        self.assertEqual(get_subject_substitute('user.{roles}', self.state), 'roles in user')
-        self.assertEqual(get_subject_substitute('user.{roles}.[0]', self.state), 'Item at index 0 in user.{roles}')
-        
+        self.assertEqual(get_subject_substitute('user.{name}', self.state), 'Name in user')
+        self.assertEqual(get_subject_substitute('user.{roles}', self.state), 'Roles in user')
+        self.assertEqual(get_subject_substitute(
+            'user.{roles}.[0]', self.state), 'Item at index 0 in user.{roles}')
