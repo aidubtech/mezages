@@ -77,14 +77,8 @@ def get_subject_substitute(path: str, state: 'State') -> Optional[str]:
         tokens = path.split('.')
         parent_path = '.'.join(tokens[:-1])
         index = tokens[-1].strip('[]')
-        subtitute = f'Item at index {index}'
+        substitute = f'Item at index {index}'
 
-
-        return f'{subtitute} in {parent_path}' if parent_path else subtitute
-
+        return f'{substitute} in {parent_path}' if parent_path else substitute
 
     return path
-
-
-
-
