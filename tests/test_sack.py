@@ -224,7 +224,7 @@ class TestMount(BaseCase):
         self.instance.mount('data')
 
         self.assertEqual(get_subject_substitute(
-            'data.user.{name}', self.instance.state), 'name in data.user')
+            'data.user.{name}', self.instance.state), 'Name in data.user')
 
     def test_mount_handle_invalid_path(self):
         '''it raises error with validation failure'''
