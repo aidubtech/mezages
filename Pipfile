@@ -11,6 +11,7 @@ flake8-literal = "*"
 flake8-absolute-import = "*"
 pyright = "*"
 mezages = {file = ".", editable = true}
+black = "*"
 
 [dev-packages]
 

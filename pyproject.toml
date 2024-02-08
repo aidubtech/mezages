@@ -22,3 +22,7 @@ classifiers = [
 Homepage  = "https://github.com/aidubtech/mezages"
 Issues    = "https://github.com/aidubtech/mezages/issues"
 Changelog = "https://github.com/aidubtech/mezages/blob/main/CHANGELOG.md"
+
+[tool.black]
+line-length = 100
+skip-string-normalization = true
