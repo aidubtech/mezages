@@ -1,7 +1,6 @@
-[project.urls]
-Homepage  = "https://github.com/aidubtech/mezages"
-Issues    = "https://github.com/aidubtech/mezages/issues"
-Changelog = "https://github.com/aidubtech/mezages/blob/main/CHANGELOG.md"
+[tool.black]
+line-length = 100
+skip-string-normalization = true
 
 [build-system]
 requires = ["setuptools"]
@@ -23,6 +22,7 @@ classifiers = [
     "License :: OSI Approved :: MIT License",
 ]
 
-[tool.black]
-line-length = 100
-skip-string-normalization = true
+[project.urls]
+Homepage  = "https://github.com/aidubtech/mezages"
+Issues    = "https://github.com/aidubtech/mezages/issues"
+Changelog = "https://github.com/aidubtech/mezages/blob/main/CHANGELOG.md"
