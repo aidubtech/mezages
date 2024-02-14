@@ -2,7 +2,7 @@ from copy import deepcopy
 from typing import Any, Optional
 from mezages.paths import ensure_path, ROOT_PATH
 from mezages.subjects import get_subject_substitute
-from mezages.buckets import FormattedBucket, format_bucket
+from mezages.buckets import FormattedBucket, ensure_bucket, format_bucket, Bucket
 from mezages.states import State, ensure_state, FormattedState
 
 
@@ -65,3 +65,12 @@ class Sack:
             new_state[new_path] = bucket
 
         self.__state = new_state
+
+    def add_messages(self, path: str, messages: Bucket) -> None:
+        path = ensure_path(path)
+        messages = ensure_bucket(messages)
+
+        if path in self.__state:
+            self.__state[path] = self.__state[path].union(messages)
+        else:
+            self.__state[path] = messages
