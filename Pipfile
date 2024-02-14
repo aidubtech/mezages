@@ -4,15 +4,15 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
-pytest = "*"
-pytest-pspec = "*"
-flake8 = "*"
-flake8-literal = "*"
-flake8-absolute-import = "*"
-pyright = "*"
-mezages = {file = ".", editable = true}
 black = "*"
+pytest = "*"
+flake8 = "*"
+pyright = "*"
+pytest-pspec = "*"
+flake8-literal = "*"
 flake8-pyproject = "*"
+flake8-absolute-import = "*"
+mezages = {file = ".", editable = true}
 
 [dev-packages]
 
