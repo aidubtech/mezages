@@ -1,76 +1,68 @@
+from typing import Self
 from copy import deepcopy
-from typing import Any, Optional
-from mezages.paths import ensure_path, ROOT_PATH
-from mezages.subjects import get_subject_substitute
-from mezages.buckets import FormattedBucket, ensure_bucket, format_bucket, Bucket
-from mezages.states import State, ensure_state, FormattedState
 
-
-class SackError(Exception):
-    pass
+from mezages.lib import (
+    Message,
+    SackStore,
+    build_message,
+    PartialMessage,
+    ensure_context_id,
+    DEFAULT_CONTEXT_ID,
+)
 
 
 class Sack:
-    def __init__(self, init_state: Any = dict()) -> None:
-        self.__state = ensure_state(init_state)
+    def __init__(self) -> None:
+        self.__store: SackStore = dict()
 
     @property
-    def state(self) -> State:
-        return deepcopy(self.__state)
+    def flat(self) -> list[Message]:
+        return [
+            message
+            for types_dict in self.store.values()
+            for bucket in types_dict.values()
+            for message in bucket
+        ]
 
     @property
-    def all(self) -> FormattedBucket:
-        return list(message for bucket in self.map.values() for message in bucket)
+    def store(self) -> SackStore:
+        return deepcopy(self.__store)
 
-    @property
-    def map(self) -> FormattedState:
-        formatted_state: FormattedState = dict()
+    def mount(self, mount_context_id: str) -> None:
+        mount_context_id = ensure_context_id(mount_context_id)
 
-        for path, bucket in self.__state.items():
-            subject_substitute = get_subject_substitute(path, self.__state)
-            formatted_state[str(path)] = format_bucket(bucket, subject_substitute)
+        if mount_context_id == DEFAULT_CONTEXT_ID:
+            return None
 
-        return formatted_state
+        new_store: SackStore = dict()
 
-    def merge(self, state: State, mount_path: Optional[str] = None) -> None:
-        state = ensure_state(state)
-        if mount_path: ensure_path(mount_path)
+        for context_id, types_dict in self.__store.items():
+            new_context_id = (
+                mount_context_id
+                if context_id == DEFAULT_CONTEXT_ID
+                else f'{mount_context_id}.{context_id}'
+            )
+            new_store[new_context_id] = {
+                message_type: [{**message, 'ctx': new_context_id} for message in bucket]
+                for message_type, bucket in types_dict.items()
+            }
 
-        for path, bucket in state.items():
-            new_path = path
+        self.__store = new_store
 
-            if mount_path:
-                if path == ROOT_PATH:
-                    new_path = mount_path
-                else:
-                    new_path = f'{mount_path}.{path}'
+    def merge(self, other: Self, mount_context_id: str = DEFAULT_CONTEXT_ID) -> None:
+        pass
 
-            previous_bucket = self.__state.get(new_path, set())
-            self.__state[new_path] = previous_bucket.union(bucket)
+    def add(self, partial_message: PartialMessage, context_id: str = DEFAULT_CONTEXT_ID) -> None:
+        return self.add_many(partial_messages=[partial_message], context_id=context_id)
 
-    def mount(self, path: str) -> None:
+    def add_many(
+        self, partial_messages: list[PartialMessage], context_id: str = DEFAULT_CONTEXT_ID
+    ) -> None:
+        context_id = ensure_context_id(context_id)
 
-        ensure_path(path)
+        for partial_message in partial_messages:
+            message = build_message(context_id, partial_message)
 
-        new_state = {}
-
-        for old_path, bucket in self.__state.items():
-            new_path = old_path
-
-            if new_path == ROOT_PATH:
-                new_path = path
-            else:
-                new_path = f'{path}.{old_path}'
-
-            new_state[new_path] = bucket
-
-        self.__state = new_state
-
-    def add_messages(self, path: str, messages: Bucket) -> None:
-        path = ensure_path(path)
-        messages = ensure_bucket(messages)
-
-        if path in self.__state:
-            self.__state[path] = self.__state[path].union(messages)
-        else:
-            self.__state[path] = messages
+            self.__store.setdefault(context_id, dict())
+            self.__store[context_id].setdefault(message['type'], list())
+            self.__store[context_id][message['type']].append(message)
