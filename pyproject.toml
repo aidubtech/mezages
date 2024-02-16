@@ -1,6 +1,25 @@
+[tool.pyright]
+include = ["src"]
+pythonVersion = "3.11"
+pythonPlatform = "All"
+typeCheckingMode = "strict"
+reportMissingTypeStubs = false
+reportUnnecessaryIsInstance = false
+
+[tool.flake8]
+extend-ignore = ["E701", "E265"]
+indent-size = 4
+max-line-length = 100
+literal-inline-quotes = "single"
+literal-multiline-quotes = "single"
+literal-docstring-quotes = "single"
+
 [tool.black]
 line-length = 100
 skip-string-normalization = true
+
+[tool.pytest.ini_options]
+addopts = "--pspec"
 
 [build-system]
 requires = ["setuptools"]
