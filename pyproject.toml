@@ -1,3 +1,11 @@
+[tool.pyright]
+include = ["src"]
+pythonVersion = "3.11"
+pythonPlatform = "All"
+typeCheckingMode = "strict"
+reportMissingTypeStubs = false
+reportUnnecessaryIsInstance = false
+
 [tool.flake8]
 extend-ignore = ["E701", "E265"]
 indent-size = 4
