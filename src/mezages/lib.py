@@ -2,80 +2,77 @@ from re import compile
 from typing import Any, Literal, Optional, TypedDict, NotRequired
 
 
-# ----------------------------------------
+# -------------------------------------
 # TYPE ALIASES
-# ----------------------------------------
+# -------------------------------------
 
-MessageType = Literal['notice'] | Literal['warning'] | Literal['failure']
+Kind = Literal['notice'] | Literal['warning'] | Literal['failure']
+
 
 Message = TypedDict(
     'Message',
     {
         'ctx': str,
-        'type': MessageType,
+        'kind': Kind,
         'summary': str,
         'description': Optional[str],
     },
 )
 
-PartialMessageDict = TypedDict(
-    'PartialMessageDict',
+
+InputMessageStruct = TypedDict(
+    'InputMessageStruct',
     {
-        'type': NotRequired[Optional[MessageType]],
+        'kind': NotRequired[Optional[Kind]],
         'summary': str,
         'description': NotRequired[Optional[str]],
     },
 )
 
-PartialMessage = str | PartialMessageDict
 
-SackStore = dict[str, dict[MessageType, list[Message]]]
+InputMessage = str | InputMessageStruct
 
-# ----------------------------------------
+# -------------------------------------
 # CONSTANTS
-# ----------------------------------------
+# -------------------------------------
 
-DEFAULT_CONTEXT_ID: str = 'global'
+GLOBAL_CONTEXT_PATH = 'global'
 
-DEFAULT_MESSAGE_TYPE: MessageType = 'notice'
+CONTEXT_KEY_REGEX = '(?:(?:[a-z0-9]+_)*[a-z0-9]+)'
 
-CONTEXT_ID_PATTERN = compile(r'(?:(?:[a-z0-9_])+)')
+CONTEXT_PATH_PATTERN = compile(fr'(?:{CONTEXT_KEY_REGEX}\.)*{CONTEXT_KEY_REGEX}')
 
-# ----------------------------------------
+# -------------------------------------
 # EXCEPTIONS
-# ----------------------------------------
+# -------------------------------------
 
 
 class ContextError(Exception):
     pass
 
 
-# ----------------------------------------
+# -------------------------------------
 # FUNCTIONS
-# ----------------------------------------
+# -------------------------------------
 
 
-def is_context_id(argument: Any) -> bool:
-    return bool(CONTEXT_ID_PATTERN.fullmatch(str(argument)))
+def ensure_context_path(value: Any) -> str:
+    if value is None or (
+        isinstance(value, str) and CONTEXT_PATH_PATTERN.fullmatch(value)
+    ):
+        return value or GLOBAL_CONTEXT_PATH
+    raise ContextError(f'Invalid context path: {repr(value)}')
 
 
-def ensure_context_id(argument: Any) -> str:
-    if is_context_id(argument):
-        return str(argument)
-
-    failure = 'Context id provided is invalid'
-    raise ContextError(f'{failure}: {repr(argument)}')
-
-
-def build_message(context_id: str, partial_message: PartialMessage) -> Message:
-    if isinstance(partial_message, str):
-        partial_message = {'summary': partial_message}
+def build_message(context_path: str, input_message: InputMessage) -> Message:
+    if isinstance(input_message, str):
+        input_message = {'summary': input_message}
 
     return Message(
         {
-            'ctx': context_id,
-            'type': partial_message.get('type') or DEFAULT_MESSAGE_TYPE,
-            'summary': partial_message['summary'],
-            'description': partial_message.get('description'),
+            'ctx': context_path,
+            'kind': input_message.get('kind') or 'notice',
+            'summary': input_message['summary'],
+            'description': input_message.get('description'),
         }
     )

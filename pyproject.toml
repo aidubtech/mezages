@@ -1,22 +1,26 @@
-#-------------------------------------#
-# FORMATTER AND LINTER
-#-------------------------------------#
+# -------------------------------------
+# BLACK: FORMATTER
+# -------------------------------------
 
 [tool.black]
-line-length = 100
+line-length = 85
 skip-string-normalization = true
+
+# -------------------------------------
+# FLAKE8: LINTER
+# -------------------------------------
 
 [tool.flake8]
 extend-ignore = ["E701", "E265"]
 indent-size = 4
-max-line-length = 100
+max-line-length = 85
 literal-inline-quotes = "single"
 literal-multiline-quotes = "single"
 literal-docstring-quotes = "single"
 
-#-------------------------------------#
-# TYPE CHECKER
-#-------------------------------------#
+# -------------------------------------
+# PYRIGHT: TYPE CHECKER
+# -------------------------------------
 
 [tool.pyright]
 include = ["src"]
@@ -26,16 +30,16 @@ typeCheckingMode = "strict"
 reportMissingTypeStubs = false
 reportUnnecessaryIsInstance = false
 
-#-------------------------------------#
-# CODE TESTER
-#-------------------------------------#
+# -------------------------------------
+# PYTEST: TEST RUNNER
+# -------------------------------------
 
 [tool.pytest.ini_options]
 addopts = "--pspec"
 
-#-------------------------------------#
-# PACKAGE PUBLICATION
-#-------------------------------------#
+# -------------------------------------
+# PACKAGE: DETAILS & PUBLICATION
+# -------------------------------------
 
 [build-system]
 requires = ["setuptools"]
