@@ -66,9 +66,7 @@ class TestMount(BaseCase):
 
         self.sack.add_messages(['First test message'], 'data')
 
-        self.sack.add_messages(
-            [{'kind': 'failure', 'summary': 'Second test message'}]
-        )
+        self.sack.add_messages([{'kind': 'failure', 'summary': 'Second test message'}])
 
     def test_mount_on_global_path(self):
         '''it returns without updating the store'''
@@ -167,9 +165,7 @@ class TestAddMessages(BaseCase):
 
         self.assertEqual(self.sack.store, dict())
 
-        self.sack.add_messages(
-            [{'kind': 'failure', 'summary': 'Second global message'}]
-        )
+        self.sack.add_messages([{'kind': 'failure', 'summary': 'Second global message'}])
 
         self.assertDictDeepEqual(
             self.sack.store,
