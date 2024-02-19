@@ -38,6 +38,45 @@ reportUnnecessaryIsInstance = false
 addopts = "--pspec"
 
 # -------------------------------------
+# TOX: CROSS PYTHON VERSION TESTER
+# -------------------------------------
+
+[tool.tox]
+min_version = "4.13.0"
+
+[testenv]
+
+basepython =
+    python3.11.0
+    python3.11.1
+    python3.11.2
+    python3.11.3
+    python3.11.4
+    python3.11.5
+    python3.11.6
+    python3.11.7
+    python3.11.8
+    python3.12.0
+    python3.12.1
+    python3.12.2
+
+[testenv.additional]
+
+basepython = python3.11.0
+
+setenv =
+    ENVIRONMENT_VARIABLE=value
+
+deps =
+    pytest
+    pytest-cov
+    my_custom_dependency>=1.0
+
+commands =
+    pytest --cov=mezages tests/
+    flake8 mezages
+
+# -------------------------------------
 # PACKAGE: DETAILS & PUBLICATION
 # -------------------------------------
 
