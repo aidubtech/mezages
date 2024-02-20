@@ -7,7 +7,7 @@ from mezages.lib import (
     InputMessage,
     build_message,
     ensure_context_path,
-    GLOBAL_CONTEXT_PATH,
+    DEFAULT_CONTEXT_PATH,
 )
 
 
@@ -37,7 +37,7 @@ class Sack:
     def mount(self, mount_context_path: str) -> None:
         mount_context_path = ensure_context_path(mount_context_path)
 
-        if mount_context_path == GLOBAL_CONTEXT_PATH:
+        if mount_context_path == DEFAULT_CONTEXT_PATH:
             return None
 
         new_store: SackStore = dict()
@@ -45,7 +45,7 @@ class Sack:
         for context_path, context_store in self.__store.items():
             new_context_path = (
                 mount_context_path
-                if context_path == GLOBAL_CONTEXT_PATH
+                if context_path == DEFAULT_CONTEXT_PATH
                 else f'{mount_context_path}.{context_path}'
             )
 

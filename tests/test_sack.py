@@ -1,5 +1,6 @@
 from mezages import Sack
 from tests.base_case import BaseCase
+from mezages.lib import DEFAULT_CONTEXT_PATH
 
 
 class TestInit(BaseCase):
@@ -49,7 +50,7 @@ class TestFlat(BaseCase):
                     'description': None,
                 },
                 {
-                    'ctx': 'global',
+                    'ctx': DEFAULT_CONTEXT_PATH,
                     'type': 'error',
                     'summary': 'Second test message',
                     'description': None,
@@ -68,18 +69,18 @@ class TestMount(BaseCase):
 
         self.sack.add_messages([{'type': 'error', 'summary': 'Second test message'}])
 
-    def test_mount_on_global_path(self):
+    def test_mount_on_default_path(self):
         '''it returns without updating the store'''
 
-        self.sack.mount('global')
+        self.sack.mount(DEFAULT_CONTEXT_PATH)
 
         self.assertDictDeepEqual(
             self.sack.store,
             {
-                'global': {
+                DEFAULT_CONTEXT_PATH: {
                     'error': [
                         {
-                            'ctx': 'global',
+                            'ctx': DEFAULT_CONTEXT_PATH,
                             'type': 'error',
                             'summary': 'Second test message',
                             'description': None,
@@ -99,8 +100,8 @@ class TestMount(BaseCase):
             },
         )
 
-    def test_mount_on_non_global_path(self):
-        '''it replaces the global path and prefixes other paths'''
+    def test_mount_on_non_default_path(self):
+        '''it replaces the default path and prefixes other paths'''
 
         self.sack.mount('test.mount')
 
@@ -142,17 +143,17 @@ class TestAddMessages(BaseCase):
 
         self.assertEqual(self.sack.store, dict())
 
-        self.sack.add_messages(['First global message'])
+        self.sack.add_messages(['First default message'])
 
         self.assertDictDeepEqual(
             self.sack.store,
             {
-                'global': {
+                DEFAULT_CONTEXT_PATH: {
                     'notice': [
                         {
-                            'ctx': 'global',
+                            'ctx': DEFAULT_CONTEXT_PATH,
                             'type': 'notice',
-                            'summary': 'First global message',
+                            'summary': 'First default message',
                             'description': None,
                         }
                     ]
@@ -165,17 +166,17 @@ class TestAddMessages(BaseCase):
 
         self.assertEqual(self.sack.store, dict())
 
-        self.sack.add_messages([{'type': 'error', 'summary': 'Second global message'}])
+        self.sack.add_messages([{'type': 'error', 'summary': 'Second default message'}])
 
         self.assertDictDeepEqual(
             self.sack.store,
             {
-                'global': {
+                DEFAULT_CONTEXT_PATH: {
                     'error': [
                         {
-                            'ctx': 'global',
+                            'ctx': DEFAULT_CONTEXT_PATH,
                             'type': 'error',
-                            'summary': 'Second global message',
+                            'summary': 'Second default message',
                             'description': None,
                         }
                     ]
@@ -188,7 +189,7 @@ class TestAddMessages(BaseCase):
 
         self.assertEqual(self.sack.store, dict())
 
-        self.sack.add_messages(['First global message'], 'some.context')
+        self.sack.add_messages(['First default message'], 'some.context')
 
         self.assertDictDeepEqual(
             self.sack.store,
@@ -198,7 +199,7 @@ class TestAddMessages(BaseCase):
                         {
                             'ctx': 'some.context',
                             'type': 'notice',
-                            'summary': 'First global message',
+                            'summary': 'First default message',
                             'description': None,
                         }
                     ]

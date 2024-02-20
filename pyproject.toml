@@ -52,10 +52,12 @@ readme = "README.md"
 requires-python = ">=3.11"
 keywords = ["message", "error", "failure", "warning"]
 description = "A library for the collection and organization of operational messages"
-authors = [{name = "Aidub Technologies", email = "abdulfataiaka@gmail.com"}]
-maintainers = [
+authors = [
     {name = "Abdulfatai Aka", email = "abdulfataiaka@gmail.com"},
+]
+maintainers = [
     {name = "Ibrahim Bello", email = "belloibrahv@gmail.com"},
+    {name = "Abdulfatai Aka", email = "abdulfataiaka@gmail.com"},
     {name = "Yusuf Ariyibi", email = "info.yusufariyibi@gmail.com"},
 ]
 classifiers = [

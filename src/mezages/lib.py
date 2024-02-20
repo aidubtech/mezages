@@ -36,7 +36,7 @@ InputMessage = str | StructInputMessage
 # CONSTANTS
 # -------------------------------------
 
-GLOBAL_CONTEXT_PATH = 'global'
+DEFAULT_CONTEXT_PATH = 'global'
 
 DEFAULT_MESSAGE_TYPE: MessageType = 'notice'
 
@@ -62,7 +62,7 @@ def ensure_context_path(value: Any) -> str:
     if value is None or (
         isinstance(value, str) and CONTEXT_PATH_PATTERN.fullmatch(value)
     ):
-        return value or GLOBAL_CONTEXT_PATH
+        return value or DEFAULT_CONTEXT_PATH
     raise ContextError(f'Invalid context path: {repr(value)}')
 
 

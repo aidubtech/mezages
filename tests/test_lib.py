@@ -15,20 +15,20 @@ class TestEnsureContextPath(BaseCase):
     def test_invalid_context_path(self):
         '''it raises a context error with expected message'''
 
-        with self.assertRaises(ContextError) as error:
+        with self.assertRaises(ContextError) as result:
             ensure_context_path('some$context')
 
-        self.assertEqual(str(error.exception), "Invalid context path: 'some$context'")
+        self.assertEqual(str(result.exception), "Invalid context path: 'some$context'")
 
-        with self.assertRaises(ContextError) as error:
+        with self.assertRaises(ContextError) as result:
             ensure_context_path(23)
 
-        self.assertEqual(str(error.exception), "Invalid context path: 23")
+        self.assertEqual(str(result.exception), "Invalid context path: 23")
 
-        with self.assertRaises(ContextError) as error:
+        with self.assertRaises(ContextError) as result:
             ensure_context_path([1, 2])
 
-        self.assertEqual(str(error.exception), "Invalid context path: [1, 2]")
+        self.assertEqual(str(result.exception), "Invalid context path: [1, 2]")
 
 
 class TestBuildMessage(BaseCase):
