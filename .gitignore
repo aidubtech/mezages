@@ -17,5 +17,6 @@ build/
 wheels/
 
 #[Byte-compiled, Optimized & DLL Files]
+.tox
 *.egg-info
 __pycache__
