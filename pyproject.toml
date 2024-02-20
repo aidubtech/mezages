@@ -3,7 +3,7 @@
 # -------------------------------------
 
 [tool.black]
-line-length = 85
+line-length = 90
 skip-string-normalization = true
 
 # -------------------------------------
@@ -13,7 +13,7 @@ skip-string-normalization = true
 [tool.flake8]
 extend-ignore = ["E701", "E265"]
 indent-size = 4
-max-line-length = 85
+max-line-length = 90
 literal-inline-quotes = "single"
 literal-multiline-quotes = "single"
 literal-docstring-quotes = "single"
