@@ -246,3 +246,116 @@ class TestAddMessages(BaseCase):
                 },
             },
         )
+
+
+class TestMerge(BaseCase):
+    '''when merging another sack into the current one'''
+
+    def setUp(self) -> None:
+        self.sack = Sack()
+
+    def test_merge_with_global_context(self) -> None:
+        '''it merges other Sack into the global context'''
+
+        other_sack = Sack()
+        other_sack.add_messages(['First test message'], 'first')
+        other_sack.add_messages(
+            [{'kind': 'failure', 'summary': 'Second test message'}], 'second'
+        )
+
+        self.sack.merge(other_sack)
+
+        self.assertDictDeepEqual(
+            self.sack.store,
+            {
+                'global.first': {
+                    'notice': [
+                        {
+                            'ctx': 'first',
+                            'kind': 'notice',
+                            'summary': 'First test message',
+                            'description': None,
+                        }
+                    ]
+                },
+                'global.second': {
+                    'failure': [
+                        {
+                            'ctx': 'second',
+                            'kind': 'failure',
+                            'summary': 'Second test message',
+                            'description': None,
+                        }
+                    ]
+                },
+            },
+        )
+
+    def test_merge_with_custom_context(self) -> None:
+        '''it merges other Sack into a custom context'''
+
+        other_sack = Sack()
+        other_sack.add_messages(['First test message'], 'first')
+        other_sack.add_messages([{'kind': 'failure', 'summary': 'Second test message'}])
+
+        self.sack.merge(other_sack, mount_context_path='user')
+
+        self.assertDictDeepEqual(
+            self.sack.store,
+            {
+                'user.first': {
+                    'notice': [
+                        {
+                            'ctx': 'first',
+                            'kind': 'notice',
+                            'summary': 'First test message',
+                            'description': None,
+                        }
+                    ]
+                },
+                'user.global': {
+                    'failure': [
+                        {
+                            'ctx': 'global',
+                            'kind': 'failure',
+                            'summary': 'Second test message',
+                            'description': None,
+                        }
+                    ]
+                },
+            },
+        )
+
+    def test_merge_with_existing_context(self) -> None:
+        '''it merges other Sack into an existing context'''
+
+        existing_sack = Sack()
+        existing_sack.add_messages(['Existing message'], 'existing_context')
+
+        other_sack = Sack()
+        other_sack.add_messages(['Other message'], 'existing_context')
+
+        self.sack.merge(existing_sack)
+        self.sack.merge(other_sack)
+
+        self.assertDictDeepEqual(
+            self.sack.store,
+            {
+                'global.existing_context': {
+                    'notice': [
+                        {
+                            'ctx': 'existing_context',
+                            'kind': 'notice',
+                            'summary': 'Existing message',
+                            'description': None,
+                        },
+                        {
+                            'ctx': 'existing_context',
+                            'kind': 'notice',
+                            'summary': 'Other message',
+                            'description': None,
+                        },
+                    ]
+                }
+            },
+        )

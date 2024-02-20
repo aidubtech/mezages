@@ -70,3 +70,20 @@ class Sack:
             self.__store.setdefault(context_path, dict())
             self.__store[context_path].setdefault(message['kind'], list())
             self.__store[context_path][message['kind']].append(message)
+
+    def merge(self, other: 'Sack', mount_context_path: Optional[str] = None) -> None:
+
+        mount_context_path = ensure_context_path(mount_context_path)
+
+        for context_path, context_store in other.store.items():
+            merged_context_path = (
+                f'{mount_context_path}.{context_path}'
+                if context_path
+                else mount_context_path
+            )
+
+            self.__store.setdefault(merged_context_path, dict())
+
+            for kind, messages in context_store.items():
+                self.__store[merged_context_path].setdefault(kind, list())
+                self.__store[merged_context_path][kind].extend(messages)
