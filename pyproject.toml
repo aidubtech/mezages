@@ -50,10 +50,14 @@ name = "mezages"
 version = "0.0.1"
 readme = "README.md"
 requires-python = ">=3.11"
-keywords = ["messages", "errors", "failures", "warnings"]
-description = "A package for the management of operational messages"
-authors = [{name = "Abdulfatai Aka", email = "abdulfataiaka@gmail.com"}]
-maintainers = [{name = "Abdulfatai Aka", email = "abdulfataiaka@gmail.com"}]
+keywords = ["message", "error", "failure", "warning"]
+description = "A library for the collection and organization of operational messages"
+authors = [{name = "Aidub Technologies", email = "abdulfataiaka@gmail.com"}]
+maintainers = [
+    {name = "Abdulfatai Aka", email = "abdulfataiaka@gmail.com"},
+    {name = "Ibrahim Bello", email = "belloibrahv@gmail.com"},
+    {name = "Yusuf Ariyibi", email = "info.yusufariyibi@gmail.com"},
+]
 classifiers = [
     "Typing :: Typed",
     "Operating System :: OS Independent",

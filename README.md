@@ -1,11 +1,15 @@
 <h1 align="center">Mezages</h1>
-<p align="center">A package to handle the formatting of operational messages</p>
+<p align="center">A library for the collection and organization of operational messages</p>
+
+## Overview
+
+The content for this section is coming soon ...
 
 ## Getting Started
 
-Ensure you are using python version 3.11+
+1. Ensure to be using python version 3.11+
 
-*Clone the repository*
+2. Clone the repository
 
 ```bash
 
@@ -13,7 +17,7 @@ $ git clone https://github.com/aidubtech/mezages.git
 
 ```
 
-*Install pipenv with pip*
+3. Install the prefered environment and dependencies manager
 
 ```bash
 
@@ -21,7 +25,7 @@ $ python -m pip install pipenv
 
 ```
 
-*Install all package dependencies into a local virtual environment*
+4. Install the required dependencies into a local virtual environment
 
 ```bash
 
@@ -29,25 +33,33 @@ $ PIPENV_VENV_IN_PROJECT=true pipenv install
 
 ```
 
-**Note:** Once VSCode loads the local virtual environment into your shells, dependency installations can be done simply by using the below commands. Otherwise, you will have to utilize the `pipenv shell` and `pipenv run` commands to work within the created local virtual environment
+## Workflow Commands
+
+1. Ensure that the virtual environment has been activated or execute
 
 ```bash
 
-$ pipenv install
-
-# OR
-
-$ pipenv install <dependency>
+$ source .venv/bin/activate
 
 ```
 
-## Quick Actions
+2. Format the codebase with [black](https://black.readthedocs.io/en/stable/index.html)
 
 ```bash
 
-$ flake8 src tests
+$ black src tests
 
 ```
+
+3. Run unit tests with [pytest](https://docs.pytest.org/en/8.0.x/contents.html)
+
+```bash
+
+$ pytest --no-header tests
+
+```
+
+4. Run type checks with [pyright](https://microsoft.github.io/pyright)
 
 ```bash
 
@@ -55,40 +67,35 @@ $ pyright src tests
 
 ```
 
-``` bash
-
-# This only needs to be executed once
-$ pipenv install --editable .
-
-```
-
-```bash
-
-# Ensure to install package before running tests
-$ pytest --no-header tests
-
-```
-
-## Learn More
-
-* [Overview](docs/overview.md)
-
 ## Maintainers
 
-<div style="display: flex; align-items: center; column-gap: 1rem">
-    <div style="display: flex; align-items: center">
-        <img src="https://github.com/belloibrahv.png" alt="avatar" style="width: 1.6rem; height: 1.6rem; border-radius: 50%" />
-        <span style="margin-left: 0.3rem">Bello Ibrahim</span>
-    </div>
-    <div style="display: flex; align-items: center">
-        <img src="https://github.com/yuusuf4real.png" alt="avatar" style="width: 1.6rem; height: 1.6rem; border-radius: 50%" />
-        <span style="margin-left: 0.3rem">Yuusuf Ariyibi</span>
-    </div>
-    <div style="display: flex; align-items: center">
-        <img src="https://github.com/abdulfataiaka.png" alt="avatar" style="width: 1.6rem; height: 1.6rem; border-radius: 50%" />
-        <span style="margin-left: 0.3rem">Abdulfatai Aka</span>
-    </div>
-</div>
+<table>
+    <tbody>
+        <tr>
+            <td align="center">
+                <a href="https://github.com/belloibrahv">
+                    <img src="https://github.com/belloibrahv.png" width="80px" alt="avatar">
+                </a>
+                <br>
+                <div>Bello Ibrahim</div>
+            </td>
+            <td align="center">
+                <a href="https://github.com/yuusuf4real">
+                    <img src="https://github.com/yuusuf4real.png" width="80px" alt="avatar">
+                </a>
+                <br>
+                <div>Yusuf Ariyibi</div>
+            </td>
+            <td align="center">
+                <a href="https://github.com/abdulfataiaka">
+                    <img src="https://github.com/abdulfataiaka.png" width="80px" alt="avatar">
+                </a>
+                <br>
+                <div>Abdulfatai Aka</div>
+            </td>
+        </tr>
+    </tbody>
+</table>
 
 ## License
 

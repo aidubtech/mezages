@@ -68,5 +68,5 @@ class Sack:
             message = build_message(context_path, input_message)
 
             self.__store.setdefault(context_path, dict())
-            self.__store[context_path].setdefault(message['kind'], list())
-            self.__store[context_path][message['kind']].append(message)
+            self.__store[context_path].setdefault(message['type'], list())
+            self.__store[context_path][message['type']].append(message)

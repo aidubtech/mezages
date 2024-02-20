@@ -6,37 +6,39 @@ from typing import Any, Literal, Optional, TypedDict, NotRequired
 # TYPE ALIASES
 # -------------------------------------
 
-Kind = Literal['notice'] | Literal['warning'] | Literal['failure']
+MessageType = Literal['notice'] | Literal['error'] | Literal['warning']
 
 
 Message = TypedDict(
     'Message',
     {
         'ctx': str,
-        'kind': Kind,
+        'type': MessageType,
         'summary': str,
         'description': Optional[str],
     },
 )
 
 
-InputMessageStruct = TypedDict(
-    'InputMessageStruct',
+StructInputMessage = TypedDict(
+    'StructInputMessage',
     {
-        'kind': NotRequired[Optional[Kind]],
+        'type': NotRequired[Optional[MessageType]],
         'summary': str,
         'description': NotRequired[Optional[str]],
     },
 )
 
 
-InputMessage = str | InputMessageStruct
+InputMessage = str | StructInputMessage
 
 # -------------------------------------
 # CONSTANTS
 # -------------------------------------
 
 GLOBAL_CONTEXT_PATH = 'global'
+
+DEFAULT_MESSAGE_TYPE: MessageType = 'notice'
 
 CONTEXT_KEY_REGEX = '(?:(?:[a-z0-9]+_)*[a-z0-9]+)'
 
@@ -71,7 +73,7 @@ def build_message(context_path: str, input_message: InputMessage) -> Message:
     return Message(
         {
             'ctx': context_path,
-            'kind': input_message.get('kind') or 'notice',
+            'type': input_message.get('type') or DEFAULT_MESSAGE_TYPE,
             'summary': input_message['summary'],
             'description': input_message.get('description'),
         }
