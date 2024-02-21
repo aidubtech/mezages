@@ -295,7 +295,7 @@ class TestMerge(BaseCase):
         '''it merges other Sack into a custom context'''
 
         other_sack = Sack()
-        other_sack.add_messages(['First test message'], 'first')
+        other_sack.add_messages(['First test message'], 'data')
         other_sack.add_messages([{'kind': 'failure', 'summary': 'Second test message'}])
 
         self.sack.merge(other_sack, mount_context_path='user')
@@ -303,17 +303,17 @@ class TestMerge(BaseCase):
         self.assertDictDeepEqual(
             self.sack.store,
             {
-                'user.first': {
+                'user.data': {
                     'notice': [
                         {
-                            'ctx': 'first',
+                            'ctx': 'data',
                             'kind': 'notice',
                             'summary': 'First test message',
                             'description': None,
                         }
                     ]
                 },
-                'user.global': {
+                'user': {
                     'failure': [
                         {
                             'ctx': 'global',

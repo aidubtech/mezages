@@ -1,6 +1,6 @@
 from copy import deepcopy
 from itertools import chain
-from typing import Optional, Sequence
+from typing import Self, Optional, Sequence
 
 from mezages.lib import (
     Message,
@@ -71,19 +71,17 @@ class Sack:
             self.__store[context_path].setdefault(message['kind'], list())
             self.__store[context_path][message['kind']].append(message)
 
-    def merge(self, other: 'Sack', mount_context_path: Optional[str] = None) -> None:
-
-        mount_context_path = ensure_context_path(mount_context_path)
+    def merge(self, other: Self, mount_context_path: Optional[str] = None) -> None:
 
         for context_path, context_store in other.store.items():
-            merged_context_path = (
-                f'{mount_context_path}.{context_path}'
-                if context_path
-                else mount_context_path
+            new_context_path = (
+                mount_context_path if mount_context_path else GLOBAL_CONTEXT_PATH
             )
 
-            self.__store.setdefault(merged_context_path, dict())
+            if context_path != GLOBAL_CONTEXT_PATH:
+                new_context_path += f'.{context_path}'
+
+            self.__store.setdefault(new_context_path, dict())
 
             for kind, messages in context_store.items():
-                self.__store[merged_context_path].setdefault(kind, list())
-                self.__store[merged_context_path][kind].extend(messages)
+                self.__store[new_context_path].setdefault(kind, list()).extend(messages)
