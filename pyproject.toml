@@ -38,7 +38,7 @@ reportUnnecessaryIsInstance = false
 addopts = "--pspec"
 
 # -------------------------------------
-# PACKAGE: DETAILS & PUBLICATION
+# PACKAGE: PUBLICATION
 # -------------------------------------
 
 [build-system]

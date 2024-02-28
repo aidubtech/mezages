@@ -5,7 +5,7 @@
 
 Ensure you are using python version 3.11+
 
-*Clone the repository*
+_Clone the repository_
 
 ```bash
 
@@ -13,7 +13,7 @@ $ git clone https://github.com/aidubtech/mezages.git
 
 ```
 
-*Install pipenv with pip*
+_Install pipenv with pip_
 
 ```bash
 
@@ -21,7 +21,7 @@ $ python -m pip install pipenv
 
 ```
 
-*Install all package dependencies into a local virtual environment*
+_Install all package dependencies into a local virtual environment_
 
 ```bash
 
@@ -55,7 +55,7 @@ $ pyright src tests
 
 ```
 
-``` bash
+```bash
 
 # This only needs to be executed once
 $ pipenv install --editable .
@@ -69,9 +69,17 @@ $ pytest --no-header tests
 
 ```
 
+```bash
+
+# Install and run tox with the commands below
+$ pipenv install tox
+$ tox
+
+```
+
 ## Learn More
 
-* [Overview](docs/overview.md)
+- [Overview](docs/overview.md)
 
 ## Maintainers
 
